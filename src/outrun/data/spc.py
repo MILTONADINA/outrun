@@ -14,9 +14,18 @@ MILE_M = 1609.344
 _TZ_TO_UTC_HOURS: dict[int, int] = {3: 6, 9: 0}
 
 
-def read_spc_tornadoes(path: Path | str) -> pd.DataFrame:
-    """DATA-07. SPC actual_tornadoes CSV -> om, begin (UTC), st, mag, slat, slon, elat, elon, len_m, wid_m."""
+def read_spc_tornadoes(path: Path | str, years: tuple[int, int] | None = None) -> pd.DataFrame:
+    """DATA-07. SPC actual_tornadoes CSV -> om, begin (UTC), st, mag, slat, slon, elat, elon, len_m, wid_m.
+
+    ``years=(first, last)`` keeps only rows with ``first <= yr <= last`` *before* the time-zone check, so a few
+    old rows with other tz codes (1956-1994 in the real file) do not stop a 2015+ load. ``None`` keeps every row.
+    ``yr`` is the SPC local (CST) year, so a tornado late on Dec 31 CST is kept by its local year even though its
+    UTC ``begin`` is in the next year; filter on ``begin`` afterwards if exact UTC bounds matter.
+    """
     df = pd.read_csv(path, low_memory=False)
+    if years is not None:
+        first, last = years
+        df = df[(df["yr"] >= first) & (df["yr"] <= last)]
     if "sg" in df.columns:
         df = df[df["sg"] == 1]  # 1 = whole track; 2/-9 are state segments of the same tornado
     df = df[df["slat"] != 0].reset_index(drop=True)  # no start point recorded

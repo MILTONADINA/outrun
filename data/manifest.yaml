@@ -95,10 +95,10 @@ sources:
     target: stream
     sha256: n/a
   - id: hrrr_smoke
-    desc: HRRR-Smoke f01+f06, 6-hourly cycles, MASSDEN/HPBL/UGRD/VGRD, 2022-2024; cap 60 GB streamed
+    desc: HRRR-Smoke f01+f06, 6-hourly cycles, MASSDEN/HPBL/UGRD/VGRD, 2022-2024; cap 80 GB streamed (T3 measured 73.5 GB at 2.095 MB/message)
     url: s3://noaa-hrrr-bdp-pds/
     access: herbie_byte_range
-    approx_bytes: 35000000000   # streamed; ~2 GB kept
+    approx_bytes: 73500000000   # streamed (T3 measured f01+f06); ~2 GB kept
     license: Public domain (NOAA)
     target: stream
     sha256: n/a

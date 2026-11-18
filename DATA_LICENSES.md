@@ -23,3 +23,4 @@ Rows tagged [CANDIDATE] are verified in T1/T3 (licence page checked, recorded in
 | Protomaps basemap (PMTiles) | Offline map tiles | Protomaps builds of OSM | ODbL 1.0 (OSM data) |
 | HIFLD (NSS shelters, hospitals, fire/EMS, schools) | Shelter and station locations | source.coop `seerai/hifld` (mirror) | [CANDIDATE] public domain (US government), per mirror terms |
 | US Census 2020 block groups | Evacuation demand | US Census Bureau | Public domain (US government) |
+| US Census 2020 PL 94-171 redistricting file, Oklahoma (`census_2020_pl94171_ok`) | Block-group population for evacuation demand | US Census Bureau | Public domain (US government) |

@@ -23,6 +23,10 @@ FLASH_PRODUCTS: tuple[str, ...] = (
     "FLASH_QPE_ARIMAX_00.00",  # max QPE ARI over all durations, in years: the flood 'ari_max' channel
 )
 
+# FLASH QPE-to-FFG products are coded in percent (100 = QPE equals flash-flood guidance, 5 % steps); read_mrms turns
+# them into a plain ratio. ARI and QPE products share no part of this prefix and are never rescaled.
+FFG_PRODUCT_PREFIX = "FLASH_QPE_FFG"
+
 _NAME_RE = re.compile(r"^MRMS_(?P<product>.+)_(?P<date>\d{8})-(?P<time>\d{6})\.grib2(\.gz)?$")
 
 
@@ -65,19 +69,45 @@ def clean_mrms(values: np.ndarray | xr.DataArray) -> np.ndarray | xr.DataArray:
     return np.where(arr < 0, np.float32(np.nan), arr)
 
 
+def is_ffg_product(product: str) -> bool:
+    """DATA-04. True for the FLASH QPE-to-FFG ratio products (coded in percent), False for ARI, QPE and the rest."""
+    return product.startswith(FFG_PRODUCT_PREFIX)
+
+
+def ffg_percent_to_ratio(values: np.ndarray | xr.DataArray) -> np.ndarray | xr.DataArray:
+    """DATA-04. FLASH FFG percent -> plain ratio (100 % -> 1.0). Missing codes are masked to NaN first."""
+    return clean_mrms(values) / np.float32(100.0)
+
+
 def read_mrms(path: Path | str, decoder: Callable[[Path], xr.DataArray] | None = None) -> xr.DataArray:
-    """DATA-04. Gunzip .gz to a temp file (raw untouched), decode (default cfgrib), clean_mrms, remove temp."""
+    """DATA-04. Gunzip .gz to a temp file (raw untouched), decode (default cfgrib), clean_mrms, remove temp.
+
+    The product comes from the file name: FLASH FFG products (``is_ffg_product``) are also turned from percent into a
+    plain ratio. This is the only place that conversion happens. Names that are not MRMS names are only cleaned,
+    except names containing ``FLASH_QPE_FFG``: those raise ValueError, because without the product we can't tell
+    whether to convert, and unconverted percent values (0-255) would look like huge ratios downstream.
+    """
     path = Path(path)
     decode = decoder if decoder is not None else _decode_cfgrib
+    try:
+        product, _ = parse_mrms_name(path.name)
+    except ValueError:
+        if FFG_PRODUCT_PREFIX in path.name:
+            raise ValueError(
+                f"{path.name}: looks like a FLASH FFG file but is not named MRMS_<product>_<YYYYMMDD>-<HHMMSS>"
+                ".grib2[.gz], so read_mrms can't convert its percent values; keep the S3 file name"
+            ) from None
+        product = ""
+    convert = ffg_percent_to_ratio if is_ffg_product(product) else clean_mrms
     if path.suffix != ".gz":
-        return clean_mrms(decode(path))
+        return convert(decode(path))
 
     fd, tmp_name = tempfile.mkstemp(suffix=".grib2")
     tmp = Path(tmp_name)
     try:
         with os.fdopen(fd, "wb") as out, gzip.open(path, "rb") as src:
             shutil.copyfileobj(src, out)
-        return clean_mrms(decode(tmp).load())  # load before the temp file disappears
+        return convert(decode(tmp).load())  # load before the temp file disappears
     finally:
         tmp.unlink(missing_ok=True)
 

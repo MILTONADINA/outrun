@@ -12,9 +12,9 @@ Conventions used below:
 - **Chip**: a mapping `variable -> float array (T, 2, A, R)` (time frame, tilt, azimuth, range gate) for the six
   variables `VARIABLES`; missing gates are `NaN`. Tilt 0 is the lowest tilt. Chip size is [CANDIDATE] 120 x 240;
   nothing below depends on it.
-- The official TorNet split rule and the category labels are [CANDIDATE] (T1 reads `mit-ll/tornet`), so the rule is
-  an injected callable and category labels are parameters with defaults `"TOR"` (tornadic) and `"WRN"`
-  (warned null).
+- The official TorNet split is the `type` column of `catalog.csv` (verified in T1 from `mit-ll/tornet`; chosen by
+  Milton on Nov 18), read per row by TORN-02. The category labels are [CANDIDATE] parameters with defaults `"TOR"`
+  (tornadic) and `"WRN"` (warned null).
 - Map motion vectors are `(u east, v north)` in m/s. Grid coordinates are EPSG:5070 metres (GRID).
 - Only `adapter.py` imports `outrun.core`. The package `__init__.py` imports nothing.
 
@@ -46,22 +46,29 @@ matching `R`/`A`, raise `ValueError`. The input chip is not modified.
 only), std 0 replaced by 1. `normalize(X, mean, std, n_norm=N_NORMALIZED)` returns a float32 copy in which the
 first `n_norm` channels are `(X - mean) / std` and the rest (mask and coordinates) are unchanged.
 
-### TORN-02 Split labels come from the frozen TorNet split rule (Must)
-`dataset.py`: `split_catalog(catalog, is_test, val_frac=0.1, seed=0, quarantine=()) -> pd.Series` labels each row
-of `catalog` (a DataFrame with a `date` column of `datetime.date` or timestamps) as `"train"`, `"val"`,
-`"test"` or `"excluded"`, indexed like `catalog`. It does not run its own algorithm: it is a thin adapter over
-`outrun.eval.splits.tornet_split` (SPLIT-02), so the tornado trainer and the frozen `splits/tornet.json` agree.
-- It builds one sample per row, `(str(index), datetime(date, 00:00 UTC), "test" if is_test(date) else "train")`,
-  calls `tornet_split(samples, quarantine=quarantine, val_frac=val_frac, seed=seed)` and labels each row with the
-  set (`train`/`val`/`test`) its id lands in. Rows in none of the three (quarantined, `SPLIT-07`, or dropped by
-  the SPLIT-02 1-day gap around test and val days) are `"excluded"`.
-- Consequences (tested): every `is_test` row is `"test"` (quarantine never changes test rows); val is a set of
-  calendar days; the labels, read back as `SplitItem(str(index), date)`, pass `validate_split(..., gap_days=1)`
-  with no violations, and equal the sets of `tornet_split` on the same samples.
-- Same inputs and seed give the same labels. A catalog without `date` raises `KeyError`.
+### TORN-02 Split labels come from the TorNet catalog `type` column (Must)
+`dataset.py`: `split_catalog(catalog, val_frac=0.1, seed=0, quarantine=(), column="type") -> pd.Series` labels each
+row of `catalog` (a DataFrame with a `date` column of `datetime.date` or timestamps, and the official split column
+`column`, by default TorNet's `type`) as `"train"`, `"val"`, `"test"` or `"excluded"`, indexed like `catalog`. It does
+not run its own algorithm: it is a thin adapter over `outrun.eval.splits.tornet_split` (SPLIT-02), so the tornado
+trainer and the frozen `splits/tornet.json` agree.
+- Official split per row: `catalog[column].str.strip().str.lower()` (the DATA-02 `official_split` `mode="column"`
+  normalisation); a value not in `{"train", "test"}` raises `ValueError`. It is never derived from the date: TorNet
+  assigns chips by storm episode, and in 2015/16/19 35 UTC calendar days hold both train and test chips (4,525 rows,
+  NOTES T1), so no date rule can reproduce it.
+- It builds one sample per row, `(str(index), datetime(date, 00:00 UTC), official)`, calls
+  `tornet_split(samples, quarantine=quarantine, val_frac=val_frac, seed=seed)` and labels each row with the set
+  (`train`/`val`/`test`) its id lands in. Rows in none of the three (quarantined, `SPLIT-07`, or dropped by the
+  SPLIT-02 1-day gap around test and val days) are `"excluded"`.
+- Consequences (tested): every official-test row is `"test"` (quarantine never changes test rows) and no
+  official-train row is `"test"`; on a mixed day the official-train rows are `"excluded"` (their day is a test day,
+  so the SPLIT-02 gap drops them), as are train rows on the days just before and after; val is a set of calendar
+  days; the labels, read back as `SplitItem(str(index), date)`, pass `validate_split(..., gap_days=1)` with no
+  violations, and equal the sets of `tornet_split` on the same samples.
+- Same inputs and seed give the same labels. A catalog without `date` or without `column` raises `KeyError`.
 - **Deviation from DESIGN 3.2** ("Val = 10% of train Julian days (grouped)"): val is drawn from whole calendar
   days (one date = one group), not from day-of-year values pooled across years. This is a decision recorded
-  here for the owner to confirm; DESIGN 3.2 should be updated to match or this rule changed.
+  here for the owner to confirm; DESIGN 3.2 was updated to match on Nov 18.
 
 ### TORN-03 Hand-crafted radar features (Must)
 `features.py`: `HAND_FEATURES = ("max_dbz", "max_dv", "min_rhohv_dbz30", "max_zdr", "max_kdp", "max_width",

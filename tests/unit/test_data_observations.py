@@ -114,6 +114,23 @@ def test_read_spc_tornadoes(tmp_path):
 
 
 @pytest.mark.req("DATA-07")
+def test_read_spc_tornadoes_year_range_skips_old_tz_codes(tmp_path):
+    rows = _spc_rows()[:2]
+    old = [9, 1970, 4, 3, "1970-04-03", "16:00:00", 6, "OK", 40, 1, 35.0, -97.0, 35.1, -96.9, 1.0, 50, 1]
+    new = [5, 2015, 5, 6, "2015-05-06", "18:00:00", 3, "OK", 40, 1, 35.3, -97.4, 35.4, -97.3, 2.0, 100, 1]
+    p = tmp_path / "mixed.csv"
+    pd.DataFrame([old, *rows, new], columns=SPC_COLS).to_csv(p, index=False)
+    with pytest.raises(ValueError):
+        spc.read_spc_tornadoes(p)  # default keeps every row, so the 1970 tz=6 row still raises
+    df = spc.read_spc_tornadoes(p, years=(2015, 2025))
+    assert list(df["om"]) == [1, 2, 5] and list(df.index) == [0, 1, 2]
+    assert df.loc[2, "begin"] == pd.Timestamp("2015-05-07 00:00", tz="UTC")
+    assert list(spc.read_spc_tornadoes(p, years=(2015, 2015))["om"]) == [5]  # both bounds inclusive
+    with pytest.raises(ValueError):
+        spc.read_spc_tornadoes(p, years=(1970, 2025))  # the strict tz check still applies inside the range
+
+
+@pytest.mark.req("DATA-07")
 def test_swath_polygons_area():
     from pyproj import Transformer
 

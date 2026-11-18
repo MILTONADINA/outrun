@@ -364,3 +364,66 @@ def test_server_ignoring_range_cannot_retry_forever(tmp_path):
     with pytest.raises(requests.exceptions.ChunkedEncodingError):
         download("u", tmp_path / "f.bin", t, expected_size=len(CONTENT), max_retries=3, sleep=sleep)
     assert t.calls == 5  # 3000 and 5000 are progress; then 3 failures that never beat 5000, then give up
+
+
+# ---------------------------------------------------------------- DATA-12 batched fetch-state writes
+class _FakeClock:
+    """Stands in for time.monotonic so the batching tests do not depend on real time."""
+
+    def __init__(self, now: float = 1000.0) -> None:
+        self.now = now
+
+    def __call__(self) -> float:
+        return self.now
+
+
+def _on_disk(path) -> dict:
+    import json
+
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+@pytest.mark.req("DATA-12")
+def test_fetch_state_default_writes_every_record(tmp_path, monkeypatch):
+    clock = _FakeClock()
+    monkeypatch.setattr("outrun.data.fetch.time.monotonic", clock)
+    path = tmp_path / "state.json"
+    state = FetchState(path)  # save_every_s defaults to 0: every record is saved at once
+    for i in range(3):
+        state.record("src", f"f{i}.bin", "ab" * 32, 10 + i)
+        assert set(_on_disk(path)["src"]) == {f"f{k}.bin" for k in range(i + 1)}
+
+
+@pytest.mark.req("DATA-12")
+def test_fetch_state_batched_writes_and_flush(tmp_path, monkeypatch):
+    clock = _FakeClock()
+    monkeypatch.setattr("outrun.data.fetch.time.monotonic", clock)
+    path = tmp_path / "state.json"
+    state = FetchState(path, save_every_s=60.0)
+    state.record("src", "a.bin", "aa" * 32, 1)  # clock 1000 s is >= 60 s past the initial 0: saved
+    assert set(_on_disk(path)["src"]) == {"a.bin"}
+
+    clock.now += 10.0
+    state.record("src", "b.bin", "bb" * 32, 2)
+    state.record("src", "c.bin", "cc" * 32, 3)
+    assert set(_on_disk(path)["src"]) == {"a.bin"}  # within 60 s: not written yet
+    assert state.get("src", "c.bin") == {"sha256": "cc" * 32, "bytes": 3}  # but kept in memory
+
+    state.flush()
+    assert set(_on_disk(path)["src"]) == {"a.bin", "b.bin", "c.bin"}
+    assert FetchState(path).records("src") == state.records("src")  # a fresh reader sees everything
+
+    clock.now += 10.0
+    state.record("src", "d.bin", "dd" * 32, 4)
+    assert "d.bin" not in _on_disk(path)["src"]  # flush restarted the 60 s window
+    clock.now += 60.0
+    state.record("src", "e.bin", "ee" * 32, 5)  # 60 s since the last save: written with the pending record
+    assert set(_on_disk(path)["src"]) == {"a.bin", "b.bin", "c.bin", "d.bin", "e.bin"}
+
+
+@pytest.mark.req("DATA-12")
+def test_fetch_state_flush_without_changes_writes_nothing(tmp_path):
+    path = tmp_path / "state.json"
+    state = FetchState(path, save_every_s=60.0)
+    state.flush()
+    assert not path.exists()

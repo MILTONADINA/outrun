@@ -281,9 +281,9 @@ outrun/
   - Tarballs go to the HDD. They are extracted one year at a time to the SSD, converted, and the extracted copy is deleted.
   - Also the SPC tornado CSV and Storm Events.
 - **Split.**
-  - The official split rule is [CANDIDATE: Julian-day based per the brief]. **T1 reads the split code in `mit-ll/tornet` and catalog.csv** and records the exact rule in NOTES.md. Fallback if it differs: implement exactly what the code does.
+  - The official split is the **`type` column of TorNet `catalog.csv`** (T1 read `mit-ll/tornet`: every loader filters on `catalog['type']`; the paper's Julian-day rule `J(t_e) mod 20 < 17` uses storm-episode start times the catalog lacks, and 35 UTC days in 2015/16/19 hold both train and test chips, so it cannot be reproduced from the date). Milton chose the column on Nov 18 (`DATA-02`, `TORN-02`).
   - The rule is applied to the 3 downloaded years. Results are labelled "official split restricted to 2015/16/19".
-  - Val = 10% of train Julian days (grouped). Quarantined dates are removed from train/val.
+  - Val = 10% of train calendar days (grouped by date, one date = one group; `TORN-02`). Quarantined dates are removed from train/val. Train chips on a day that also has test chips are excluded (1-day gap, `SPLIT-02`).
 - **Preprocessing.**
   - 6 variables (DBZ, VEL, KDP, RHOHV, ZDR, WIDTH) x 2 tilts, last frame = 12 channels, plus last-minus-first difference = 12 more.
   - Fill values become per-variable constants, with a missing mask channel added.
@@ -314,7 +314,7 @@ outrun/
 
 - **Data.**
   - MRMS `MultiSensor_QPE_01H_Pass2`, Apr-Sep 2021-2025 CONUS: 5 x 183 d x 24 = 21,960 files x 0.45 MB, about 10 GB.
-  - MRMS FLASH QPE-to-FFG ratio (1 h, 3 h) and QPE ARI products [CANDIDATE product names, e.g. `FLASH_QPE_FFG01H`/`FLASH_QPE_ARI01H`; **T3 lists `s3://noaa-mrms-pds/CONUS/`** and measures file size]. Fetched only in event windows: ±6 h around CONUS flash-flood report hours plus 20% random rainy hours, capped at 20 GB.
+  - MRMS FLASH QPE-to-FFG ratio (1 h, 3 h) and QPE ARI products [CANDIDATE product names, e.g. `FLASH_QPE_FFG01H`/`FLASH_QPE_ARI01H`; **T3 lists `s3://noaa-mrms-pds/CONUS/`** and measures file size]. T3: the FFG products are coded in percent (100 = QPE equals guidance, 5% steps; -999 outside the domain), so the reader masks missing codes and divides by 100 to give a plain ratio (`DATA-04`). Fetched only in event windows: ±6 h around CONUS flash-flood report hours plus 20% random rainy hours, capped at 20 GB.
   - Fallback if FLASH is absent in the bucket: the ARI-style rule (3 h ≥ 50 mm or 6 h ≥ 75 mm) becomes the operational-style baseline. This is documented.
   - Training statics: ETOPO 2022 30" CONUS crop [CANDIDATE < 1 GB] resampled to MRMS 0.01 degree for elevation, slope and TPI. The 1-arcsec CONUS 3DEP mosaic is not used.
   - OKC road downscaling: 6 USGS 3DEP 10 m tiles (about 2.6 GB).
@@ -330,7 +330,7 @@ outrun/
 - **Training budget.** About 40-60k patches, about 1.5-2 h [estimate].
 - **Evaluation.**
   - Metrics: AUPRC, Brier/reliability, neighbourhood CSI (10 km, ±1 h), event POD (fraction of reports covered) and false-alarm area.
-  - **Baselines:** (1) operational **FLASH QPE/FFG ratio ≥ 1.0**; (2) QPE ARI ≥ 10-yr; (3) logistic regression on the same features.
+  - **Baselines:** (1) operational **FLASH QPE/FFG ratio ≥ 1.0** (plain ratio after the percent conversion); (2) QPE ARI ≥ 10-yr; (3) logistic regression on the same features.
   - Ablation: model without FLASH inputs, because FFG is both input and baseline.
 - **Pitfalls to check.**
   - Population/reporting bias: population is not an input. Report POD and AUPRC by urban/rural (census density terciles), plus a permutation check with a population channel added.
@@ -420,9 +420,9 @@ outrun/
 - **Data.**
   - EPA AQS `hourly_88101_{2022,2023,2024}.zip` (about 210 MB). [CANDIDATE: 2025 file posted, checked in T1; used as an extra test year if complete.]
   - HRRR-Smoke via byte-range: **6-hourly cycles (00/06/12/18Z), f01 and f06 only**, 4 fields: MASSDEN 8 m, HPBL, UGRD 10 m, VGRD 10 m.
-  - **Volume:** 1,096 days x 4 cycles x 2 leads x 4 fields = 35,072 messages x m. At m = 1.0 MB [CANDIDATE; T3], about 35 GB streamed. Cap 60 GB; if exceeded, drop f01.
+  - **Volume:** 1,096 days x 4 cycles x 2 leads x 4 fields = 35,072 messages x m. T3 measured m = 2.095 MB, so about 73.5 GB streamed (f06 alone 36.7 GB). Cap 80 GB (raised from 60 GB on Nov 18 so both leads fit; SMOKE-04 needs f01 and f06); if exceeded, drop f01.
   - Kept: 9x9 3 km patches at about 1,000 monitors + a 9 km CONUS grid, about 2 GB.
-  - MASSDEN unit change on 2021-12-21 (µg/m³ to kg/m³). This is before our window but asserted in code (`SMOKE-03`).
+  - MASSDEN unit change on 2021-12-21 (µg/m³ to kg/m³). This is before our window but asserted in code (`SMOKE-03`). cfgrib reports MASSDEN units as `unknown`, so the unit is decided by the valid-time date plus a magnitude guard (kg/m³ values must be ≤ 1e-3); an explicit contradictory units string still raises (`DATA-03`).
   - NOAA HMS daily smoke polygons 2022-2024 (about 0.5 GB), rasterized to density 0-3. This is the **satellite input**.
 - **Split.**
   - Time: train 2022-01..2023-06 (includes the June 2023 Canadian smoke), val 2023-07..2023-12, test 2024.
@@ -751,7 +751,7 @@ No single event is covered by all six datasets: SEVIR covers 2017-2019, MRMS on 
 | # | Risk | Mitigation |
 |---|---|---|
 | 1 | Downloads slow or endpoints gone (Zenodo throttling, Kaggle auth, HIFLD mirror moved, Storm Events/AQS 2025 not posted) | All bulk downloads start Nov 17-18, resumable, with sizes and sha256 in the manifest. Fallbacks: TorNet 2019 only; HIFLD -> Data Rescue -> OSM; Kaggle -> WSTS-only training (loses the 0.284 comparison); year fallbacks per section 3. |
-| 2 | HRRR volume or tooling (eccodes on macOS) blows the schedule | T3 decodes one message per product and measures size before bulk. Hard caps (ice 80 GB, smoke 60 GB streamed) with predefined cut rules; pygrib fallback. |
+| 2 | HRRR volume or tooling (eccodes on macOS) blows the schedule | T3 decodes one message per product and measures size before bulk. Hard caps (ice 80 GB, smoke 80 GB streamed) with predefined cut rules; pygrib fallback. |
 | 3 | IR107 larger than expected, or poor overlap with VIL | T1 `aws s3 ls` + CATALOG overlap count; the 60 GB rule in 3.1; the ablation uses the same events. |
 | 4 | MPS bugs or slow epochs | Plain Conv2d; `PYTORCH_ENABLE_MPS_FALLBACK=1`; one timed epoch before every overnight run; checkpoint every epoch with a resume flag; fp32 fallback. |
 | 5 | Weak labels make flood/ice/smoke near-random or lose to baselines | Hard negatives, uncertain ring, MIL, honest comparison to operational rules; the layer still ships; the report treats it as a finding. |
@@ -872,7 +872,7 @@ The worst-case PROC peak (≈ 165 GB) is over the lowered 150 GB cap. Without th
 | # | Change | Source / reason | Where |
 |---|---|---|---|
 | 1 | Base kept: coverage table, baseline-first adapters, `--risk-source` switch, avoid-current-only baseline, MSA baseline, admissibility rule, shelter-in-place, vanilla MapLibre + PMTiles, small subset downloads, checkpointed calendar | delivery-risk-first (winner) | 1-8 |
-| 2 | HRRR volumes recomputed as days x cycles x leads x fields x MB/message, with caps and cut rules. Ice: 3-hourly, f01 only, about 42k messages, cap 80 GB. Smoke: 6-hourly, f01/f06, about 35k messages, cap 60 GB. MB/message measured in T3 first. Rejected f00 (zero accumulations) and hourly/f01-f12 plans | must-fix (both judges) | 3.5, 3.6, T3 |
+| 2 | HRRR volumes recomputed as days x cycles x leads x fields x MB/message, with caps and cut rules. Ice: 3-hourly, f01 only, about 42k messages, cap 80 GB. Smoke: 6-hourly, f01/f06, about 35k messages, cap 80 GB (raised from 60 GB after T3 measured 73.5 GB). MB/message measured in T3 first. Rejected f00 (zero accumulations) and hourly/f01-f12 plans | must-fix (both judges) | 3.5, 3.6, T3 |
 | 3 | Ice window starts winter 2020-21 after the HRRR v4 switch (all v4); test = latest winter 2024-25; case chosen inside the window. Dropped the Oct 2020 and Feb 2021 cases | must-fix | 3.5, 6.4 |
 | 4 | TorNet split rule verified from `mit-ll/tornet` code in T1; TorNet kept to 2019/2015/2016, more years as a lever | must-fix | 3.2, T1 |
 | 5 | Case days quarantined (±3 d removed from train/val) instead of forced into test. Official splits unmodified and reported alongside the case hold-out set. One official-test OK SEVIR event added | must-fix (both) | 3, 6.1, 6.4 |

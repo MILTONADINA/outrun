@@ -131,15 +131,20 @@ one constant per variable used for missing (NaN) gates.
   times before `HRRR_V4_START` are dropped; sorted ascending, no duplicates.
 - `choose_ice_cycles(mean_mb_per_message, threshold_mb=1.9) -> tuple[int, ...]`: `(0, 6, 12, 18)` if
   `mean_mb_per_message > threshold_mb`, else the 3-hourly `(0, 3, ..., 21)` (DESIGN 3.5 80 GB cap).
-- `choose_smoke_leads(mean_mb_per_message, n_days=1096, cap_gb=60.0) -> tuple[int, ...]`: streamed volume
+- `choose_smoke_leads(mean_mb_per_message, n_days=1096, cap_gb=80.0) -> tuple[int, ...]`: streamed volume
   `n_days * 4 cycles * len(leads) * 4 fields * mb / 1000` GB; returns `(1, 6)` if that is `<= cap_gb` for `(1, 6)`,
-  else `(6,)` (DESIGN 3.6: drop f01).
+  else `(6,)` (DESIGN 3.6: drop f01). The cap was raised from 60 to 80 GB (Milton, Nov 18) because T3 measured
+  2.095 MB/message, i.e. 73.5 GB for f01+f06, and SMOKE-04 needs both leads; so `choose_smoke_leads(2.095) == (1, 6)`.
 - MASSDEN: `MASSDEN_UNIT_CHANGE = datetime(2021, 12, 21, tzinfo=UTC)`. `massden_to_ugm3(values, valid_time)` has exactly
   the SMOKE-03 semantics (before the change values are ug/m3 and returned unchanged as float32; at or after it they are
   kg/m3 and multiplied by 1e9; after the change a raw value > 1e-3 raises `ValueError`; negative values raise
   `ValueError`; NaN passes through; naive time raises `ValueError`). The smoke package may delegate to this function.
   `check_massden_units(units, valid_time)`: the GRIB `units` string must contain `"kg"` (case-insensitive) when
-  `valid_time >= MASSDEN_UNIT_CHANGE` and must not contain it before; a mismatch raises `ValueError`.
+  `valid_time >= MASSDEN_UNIT_CHANGE` and must not contain it before; a mismatch raises `ValueError`. The string
+  `"unknown"` (case-insensitive, stripped) is accepted at any time and returns `None`: real cfgrib output names the
+  MASSDEN variable `unknown` with units `unknown` (T3), so the unit is decided by the valid-time date (kg/m3 from
+  2021-12-21 00Z) plus the `massden_to_ugm3` magnitude guard (after the change a value > 1e-3 raises). An explicit
+  contradictory string (e.g. `"ug m-3"` after the change, `"kg m**-3"` before) still raises.
 
 ### DATA-04 MRMS reader: QPE 01H Pass2 + FLASH GRIB2 decode, crop, 1/3/6/24 h accumulations
 **Must (proposal: real radar + weather data).** Module `data/mrms.py`.
@@ -153,7 +158,18 @@ T3 lists `s3://noaa-mrms-pds/CONUS/`); key layout `CONUS/{product}/{YYYYMMDD}/MR
   raises `ValueError`.
 - `read_mrms(path, decoder=None) -> xr.DataArray`: if `path` ends with `.gz` it is gunzipped to a temporary file first
   (the raw file is never modified); `decoder(path_to_grib2) -> xr.DataArray` (default: cfgrib via xarray) decodes it.
-  The result goes through `clean_mrms`. The temporary file is removed afterwards.
+  The result goes through `clean_mrms`. The temporary file is removed afterwards. The product is taken from the
+  original file name (`parse_mrms_name`); a name that is not an MRMS name is only cleaned (no error), except a
+  non-MRMS name containing `FLASH_QPE_FFG`, which raises `ValueError` (its percent values can't be converted
+  safely without the product). For FLASH FFG
+  products (`is_ffg_product(product)`) the result is `ffg_percent_to_ratio(values)` instead, so callers always get a
+  plain ratio. `read_mrms` is the only place this conversion happens (never convert twice downstream).
+- FLASH FFG units (T3, real files): `FLASH_QPE_FFG*` products are coded in **percent** (100 = QPE equals flash-flood
+  guidance, 5 % steps); -999 = outside the domain. `FFG_PRODUCT_PREFIX = "FLASH_QPE_FFG"`;
+  `is_ffg_product(product) -> bool` is True exactly for names starting with that prefix (never ARI such as
+  `FLASH_QPE_ARIMAX_00.00`, never QPE). `ffg_percent_to_ratio(values)` (array or DataArray) first masks missing codes
+  with `clean_mrms` (negative -> NaN), then divides by 100: `[-999, -3, 100, 5] -> [NaN, NaN, 1.0, 0.05]`, float32.
+  ARI and QPE values are never rescaled.
 - `clean_mrms(values) -> float32` (array or DataArray): negative values (MRMS -3 = no coverage, -999 = missing) become
   NaN; everything else unchanged.
 - `crop_latlon(da, bbox) -> xr.DataArray`: `da` has 1-D dimension coordinates `latitude` (ascending or descending) and
@@ -229,11 +245,15 @@ channels not listed). Fixed rules: `WIND_DIR_CHANNEL = "th"`, `FIRE_CHANNEL = "P
   `narrative`) and the flood labels.
 - `stormevents.filter_event_types(df, types) -> pd.DataFrame`: rows whose `event_type` equals one of `types`
   (case-insensitive, stripped), order kept, index reset.
-- `spc.read_spc_tornadoes(path) -> pd.DataFrame` `[CANDIDATE columns: om, yr, mo, dy, date, time, tz, st, mag, slat,
-  slon, elat, elon, len, wid, sg]`: columns `om`, `begin` (UTC from `date` + `time`; `tz == 3` is CST = UTC-6 all year,
-  `tz == 9` is GMT, any other `tz` raises `ValueError`), `st`, `mag`, `slat`, `slon`, `elat`, `elon` (end point
-  `0, 0` replaced by the start point), `len_m` (miles x 1609.344), `wid_m` (yards x 0.9144). Rows with `slat == 0` are
-  dropped; if an `sg` column exists only `sg == 1` rows (whole tracks) are kept. Index reset.
+- `spc.read_spc_tornadoes(path, years=None) -> pd.DataFrame` `[CANDIDATE columns: om, yr, mo, dy, date, time, tz, st,
+  mag, slat, slon, elat, elon, len, wid, sg]`: columns `om`, `begin` (UTC from `date` + `time`; `tz == 3` is CST =
+  UTC-6 all year, `tz == 9` is GMT, any other `tz` raises `ValueError`), `st`, `mag`, `slat`, `slon`, `elat`, `elon`
+  (end point `0, 0` replaced by the start point), `len_m` (miles x 1609.344), `wid_m` (yards x 0.9144). Rows with
+  `slat == 0` are dropped; if an `sg` column exists only `sg == 1` rows (whole tracks) are kept. Index reset.
+  `years=(first, last)` keeps only rows with `first <= yr <= last` (both inclusive), applied **before** the `tz` check,
+  so rows outside the range never raise; `years=None` (default) keeps every row, and the strict `tz` check still applies
+  to every kept row. Reason (T3, real file): tz counts are {3: 73,421, 6: 28 (1965-1994), 0: 8 (1956-1984), 9: 1
+  (1968)}, so the full file raises without a year range; the pipeline only uses 2015+.
 - `spc.swath_polygons(df, crs="EPSG:5070", min_width_m=50.0) -> geopandas.GeoDataFrame`: one polygon per row: the
   segment start -> end projected from EPSG:4326 to `crs`, buffered by `max(wid_m, min_width_m) / 2` with round caps
   (a zero-length track becomes a disc). Columns of `df` are kept.
@@ -323,10 +343,14 @@ max_hours=None) -> list[datetime]`:
 **Must (pipeline).** Module `data/fetch.py`.
 
 - `sha256_file(path, chunk_size=1 << 20) -> str`: lowercase hex, equal to `hashlib.sha256(bytes).hexdigest()`.
-- `FetchState(path)`: JSON record `{source_id: {relpath: {"sha256": str, "bytes": int}}}`. A missing file is an empty
-  state; invalid JSON raises `ValueError`. `record(source_id, relpath, sha256, nbytes)` updates and persists
-  immediately (write to a temporary file, then `os.replace`); `get(source_id, relpath) -> dict | None`. A new
-  `FetchState` on the same path sees earlier records.
+- `FetchState(path, *, save_every_s=0.0)`: JSON record `{source_id: {relpath: {"sha256": str, "bytes": int}}}`. A
+  missing file is an empty state; invalid JSON raises `ValueError`. `record(source_id, relpath, sha256, nbytes)`
+  updates and, with the default `save_every_s=0`, persists immediately (write to a temporary file, then
+  `os.replace`); `get(source_id, relpath) -> dict | None`. A new `FetchState` on the same path sees earlier records.
+  Batched writes (for sources with tens of thousands of files): with `save_every_s > 0`, `record` saves only when at
+  least `save_every_s` seconds (monotonic clock) have passed since the last save (whose time starts at 0);
+  records in between are kept in memory (`get` sees them). `flush()` saves pending records atomically and does
+  nothing if nothing changed; a caller that uses batching must call `flush()` when it finishes.
 - Layout: files of source `s` live under `raw_root / s.id /` (single-file sources: `raw_root / s.id / basename(url)`);
   relpaths in the state are relative to `raw_root / s.id` with `/` separators.
 - `verify_source(source, raw_root, state) -> VerifyReport` (`ok`, `mismatched`, `missing`, `unrecorded`: sorted lists

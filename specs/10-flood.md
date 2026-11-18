@@ -31,7 +31,8 @@ and logistic regression on the same features.
 `("qpe_1h", "qpe_3h", "qpe_6h", "qpe_24h", "ffg_ratio_1h", "ffg_ratio_3h", "ari_max", "elevation", "slope", "tpi", "valid")`.
 
 `build_features(qpe_1h, qpe_3h, qpe_6h, qpe_24h, ffg_ratio_1h, ffg_ratio_3h, ari_max, elevation, slope, tpi) -> np.ndarray`
-takes ten `(H, W)` arrays (QPE accumulations in mm ending at the issue time, FLASH QPE/FFG ratios, max QPE ARI in
+takes ten `(H, W)` arrays (QPE accumulations in mm ending at the issue time, FLASH QPE/FFG plain ratios (DATA-04
+converts the raw percent), max QPE ARI in
 years, elevation m, slope degrees, TPI m) and returns a `float32` array `(11, H, W)` in `FLOOD_CHANNELS` order.
 - Channel `valid` is `1.0` where all ten inputs are finite at that pixel, else `0.0`.
 - Every non-finite input value is written as `0.0` in the output (no NaN or inf in the output).
@@ -101,6 +102,8 @@ In `baselines.py`, each returns a `float32` probability array of the input shape
 NaN inputs give `0.0`:
 - `ffg_ratio_baseline(ffg_ratio_1h, ffg_ratio_3h, threshold=1.0)`: `1` where `max(ratio_1h, ratio_3h) >= threshold`
   (operational FLASH QPE/FFG ratio >= 1; also the adapter's rule baseline, DESIGN "FFG ratio >= 1 gives p = 1").
+  The ratios are **plain ratios** (1.0 = QPE equals flash-flood guidance): MRMS codes them in percent and DATA-04
+  `read_mrms` divides by 100, so threshold 1.0 is 100 % in the raw file.
 - `ari_baseline(ari_max_years, threshold_years=10.0)`: `1` where max QPE ARI `>= threshold_years`.
 - `ari_rule_fallback(qpe_3h, qpe_6h, mm_3h=50.0, mm_6h=75.0)`: `1` where `qpe_3h >= 50` or `qpe_6h >= 75`
   (used only if FLASH is absent from the bucket; documented in NOTES).

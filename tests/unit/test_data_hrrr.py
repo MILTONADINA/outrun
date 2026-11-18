@@ -146,7 +146,15 @@ def test_cycle_and_lead_caps():
     assert choose_ice_cycles(1.9) == (0, 3, 6, 9, 12, 15, 18, 21)
     assert choose_ice_cycles(2.0) == (0, 6, 12, 18)
     assert choose_smoke_leads(1.0) == (1, 6)  # ~35 GB
-    assert choose_smoke_leads(2.2) == (6,)  # ~77 GB > 60
+    assert choose_smoke_leads(2.2, cap_gb=60.0) == (6,)  # ~77 GB > 60: the drop-f01 rule itself is unchanged
+    assert choose_smoke_leads(2.3) == (6,)  # ~80.7 GB > 80
+
+
+@pytest.mark.req("DATA-03")
+def test_smoke_leads_measured_volume_fits_80gb_cap():
+    # T3 measured 2.095 MB/message: f01+f06 = 1096 * 4 * 2 * 4 * 2.095 / 1000 = 73.5 GB, under the 80 GB cap.
+    assert choose_smoke_leads(2.095) == (1, 6)
+    assert choose_smoke_leads(2.2) == (1, 6)  # ~77 GB, also under 80
 
 
 # ---------------------------------------------------------------- MASSDEN
@@ -179,3 +187,18 @@ def test_massden_units_check():
         check_massden_units("kg m**-3", before)
     with pytest.raises(ValueError):
         check_massden_units("ug m-3", after)
+
+
+@pytest.mark.req("DATA-03")
+def test_massden_units_unknown_from_cfgrib_is_accepted():
+    after = datetime(2022, 6, 1, tzinfo=UTC)
+    before = datetime(2021, 6, 1, tzinfo=UTC)
+    assert check_massden_units("unknown", after) is None  # real cfgrib output for MASSDEN
+    assert check_massden_units(" Unknown ", hrrr.MASSDEN_UNIT_CHANGE) is None
+    assert check_massden_units("unknown", before) is None
+    with pytest.raises(ValueError):
+        check_massden_units("ug", after)  # an explicit contradictory string still raises
+    # with units unknown, the date + magnitude guard decides: ug/m3-sized values after the change still raise
+    with pytest.raises(ValueError):
+        massden_to_ugm3(np.array([5.0]), after)
+    np.testing.assert_allclose(massden_to_ugm3(np.array([2e-8]), after), [20.0], rtol=1e-5)

@@ -132,14 +132,27 @@ def _catalog() -> pd.DataFrame:
     days = [date(2015, 1, 1) + timedelta(days=k) for k in range(0, 365, 2)]
     days += [date(2016, 1, 1) + timedelta(days=k) for k in range(0, 366, 3)]
     rows = [d for d in days for _ in range(2)]  # two chips per day
-    return pd.DataFrame({"date": rows, "chip": range(len(rows))})
+    types = ["test" if d.month == 12 else "train" for d in rows]
+    return pd.DataFrame({"date": rows, "chip": range(len(rows)), "type": types})
+
+
+MIXED_DAY = date(2015, 6, 15)
 
 
 def _daily_catalog() -> pd.DataFrame:
-    """Two chips on every calendar day of 2015, so val, train and test days are consecutive somewhere."""
+    """Two chips on every calendar day of 2015, so val, train and test days are consecutive somewhere.
+
+    The official split is the catalog ``type`` column: December is test, and MIXED_DAY holds one train and one test
+    chip (TorNet assigns by storm episode, so one UTC day can hold both). Some values need strip/lower-casing.
+    """
     days = [date(2015, 1, 1) + timedelta(days=k) for k in range(365)]
     rows = [d for d in days for _ in range(2)]
-    return pd.DataFrame({"date": rows, "chip": range(len(rows))})
+    cat = pd.DataFrame({"date": rows, "chip": range(len(rows))})
+    cat["type"] = ["test" if d.month == 12 else "train" for d in rows]
+    first_mixed = cat.index[cat["date"] == MIXED_DAY][0]
+    cat.loc[first_mixed, "type"] = " Test "
+    cat.loc[cat["date"] == date(2015, 3, 3), "type"] = "TRAIN"
+    return cat
 
 
 @pytest.mark.req("TORN-02")
@@ -150,12 +163,12 @@ def test_split_catalog_rules():
     from outrun.hazards.tornado.dataset import split_catalog
 
     cat = _daily_catalog()
-    is_test = lambda d: d.month == 12  # noqa: E731 (toy official rule)
+    official = cat["type"].str.strip().str.lower()
     quarantine = {date(2015, 5, 1), date(2015, 5, 3), date(2015, 9, 9)}
-    lab = split_catalog(cat, is_test, val_frac=0.1, seed=0, quarantine=quarantine)
+    lab = split_catalog(cat, val_frac=0.1, seed=0, quarantine=quarantine)
     assert isinstance(lab, pd.Series) and list(lab.index) == list(cat.index)
     assert set(lab.unique()) <= {"train", "val", "test", "excluded"}
-    test_mask = cat["date"].map(is_test)
+    test_mask = official == "test"
     assert (lab[test_mask] == "test").all()  # quarantine never changes test rows
     assert (lab[~test_mask] != "test").all()
     q_mask = cat["date"].isin(quarantine) & ~test_mask
@@ -163,10 +176,17 @@ def test_split_catalog_rules():
     assert (lab[cat["date"] == date(2015, 11, 30)] == "excluded").all()  # 1-day gap before the first test day
     assert (lab == "train").any() and (lab == "val").any()
 
+    # the mixed day: the label comes from the column, not the date; its train chip falls in the test-day gap
+    mixed = cat["date"] == MIXED_DAY
+    assert list(lab[mixed & test_mask]) == ["test"]
+    assert list(lab[mixed & ~test_mask]) == ["excluded"]
+    near = cat["date"].isin({MIXED_DAY - timedelta(days=1), MIXED_DAY + timedelta(days=1)})
+    assert (lab[near] == "excluded").all()
+
     # labels equal the frozen SPLIT-02 rule on the same samples
     samples = [
-        (str(i), datetime(d.year, d.month, d.day, tzinfo=UTC), "test" if is_test(d) else "train")
-        for i, d in zip(cat.index, cat["date"], strict=True)
+        (str(i), datetime(d.year, d.month, d.day, tzinfo=UTC), o)
+        for i, d, o in zip(cat.index, cat["date"], official, strict=True)
     ]
     ref = tornet_split(samples, quarantine=quarantine, val_frac=0.1, seed=0)
     for part in ("train", "val", "test"):
@@ -188,14 +208,20 @@ def test_split_catalog_deterministic_and_errors():
     from outrun.hazards.tornado.dataset import split_catalog
 
     cat = _catalog()
-    rule = lambda d: d.month == 12  # noqa: E731
-    a = split_catalog(cat, rule, seed=3)
-    b = split_catalog(cat, rule, seed=3)
+    a = split_catalog(cat, seed=3)
+    b = split_catalog(cat, seed=3)
     pd.testing.assert_series_equal(a, b)
-    small = pd.DataFrame({"date": [date(2015, 1, 1), date(2015, 1, 2)]})
-    assert (split_catalog(small, lambda d: False, val_frac=0.1) == "val").sum() == 1  # at least one group
+    renamed = cat.rename(columns={"type": "official"})
+    pd.testing.assert_series_equal(split_catalog(renamed, seed=3, column="official"), a)
+    small = pd.DataFrame({"date": [date(2015, 1, 1), date(2015, 1, 2)], "type": ["train", "train"]})
+    assert (split_catalog(small, val_frac=0.1) == "val").sum() == 1  # at least one group
     with pytest.raises(KeyError):
-        split_catalog(cat.rename(columns={"date": "day"}), rule)
+        split_catalog(cat.rename(columns={"date": "day"}))
+    with pytest.raises(KeyError):
+        split_catalog(cat.drop(columns="type"))
+    bad = small.assign(type=["train", "val"])
+    with pytest.raises(ValueError):
+        split_catalog(bad)
 
 
 # ---------------------------------------------------------------- TORN-03 hand features

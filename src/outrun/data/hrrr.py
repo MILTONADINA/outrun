@@ -150,9 +150,9 @@ def choose_ice_cycles(mean_mb_per_message: float, threshold_mb: float = 1.9) -> 
 
 
 def choose_smoke_leads(
-    mean_mb_per_message: float, n_days: int = 1096, cap_gb: float = 60.0
+    mean_mb_per_message: float, n_days: int = 1096, cap_gb: float = 80.0
 ) -> tuple[int, ...]:
-    """DATA-03. (1, 6) if n_days*4*2*4*mb/1000 <= cap_gb, else (6,)."""
+    """DATA-03. (1, 6) if n_days*4*2*4*mb/1000 <= cap_gb, else (6,). Cap 80 GB (T3 measured 73.5 GB for f01+f06)."""
     cycles_per_day, n_fields = 4, 4
     both_leads_gb = n_days * cycles_per_day * 2 * n_fields * mean_mb_per_message / 1000.0
     return (1, 6) if both_leads_gb <= cap_gb else (6,)
@@ -173,8 +173,14 @@ def massden_to_ugm3(values: np.ndarray, valid_time: datetime) -> np.ndarray:
 
 
 def check_massden_units(units: str, valid_time: datetime) -> None:
-    """DATA-03. Units must contain "kg" at/after MASSDEN_UNIT_CHANGE and must not before; else ValueError."""
+    """DATA-03. Units must contain "kg" at/after MASSDEN_UNIT_CHANGE and must not before; else ValueError.
+
+    cfgrib reports MASSDEN with units "unknown" (its GRIB tables lack the parameter). That string says nothing, so it
+    is accepted: the unit is then decided by the valid-time date and the magnitude guard in ``massden_to_ugm3``.
+    """
     _require_aware(valid_time)
+    if units.strip().lower() == "unknown":
+        return None
     has_kg = "kg" in units.lower()
     if valid_time >= MASSDEN_UNIT_CHANGE and not has_kg:
         raise ValueError(f"MASSDEN units {units!r} at {valid_time}: expected kg/m3")

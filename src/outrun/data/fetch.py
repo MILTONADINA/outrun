@@ -244,11 +244,19 @@ def sha256_file(path: Path | str, chunk_size: int = 1 << 20) -> str:
 
 
 class FetchState:
-    """DATA-12. Persistent JSON ``{source_id: {relpath: {"sha256": str, "bytes": int}}}``; each record is written
-    atomically. Missing file = empty state; invalid JSON -> ValueError."""
+    """DATA-12. Persistent JSON ``{source_id: {relpath: {"sha256": str, "bytes": int}}}``, always saved atomically
+    (temp file + rename). By default every ``record`` saves at once. With ``save_every_s`` > 0, records made since
+    the last save are only in memory until the next timed save or ``flush()``: call ``flush()`` in a ``finally``,
+    or a crash loses them and those files show as "unrecorded". Missing file = empty state; invalid JSON ->
+    ValueError."""
 
-    def __init__(self, path: Path | str) -> None:
+    def __init__(self, path: Path | str, *, save_every_s: float = 0.0) -> None:
+        """``save_every_s`` > 0 batches writes: ``record`` saves at most that often and ``flush`` saves the rest.
+        Use it for sources with tens of thousands of files, where rewriting the whole JSON per file is slow."""
         self.path = Path(path)
+        self.save_every_s = float(save_every_s)
+        self._last_save = 0.0
+        self._dirty = False
         self._data: dict[str, dict[str, dict]] = {}
         if self.path.exists():
             try:
@@ -261,6 +269,14 @@ class FetchState:
 
     def record(self, source_id: str, relpath: str, sha256: str, nbytes: int) -> None:
         self._data.setdefault(source_id, {})[relpath] = {"sha256": sha256, "bytes": int(nbytes)}
+        self._dirty = True
+        if self.save_every_s <= 0 or time.monotonic() - self._last_save >= self.save_every_s:
+            self.flush()
+
+    def flush(self) -> None:
+        """Write the state atomically if anything changed since the last save."""
+        if not self._dirty:
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(dir=self.path.parent, prefix=self.path.name + ".", suffix=".tmp")
         try:
@@ -270,6 +286,8 @@ class FetchState:
         except BaseException:
             Path(tmp).unlink(missing_ok=True)
             raise
+        self._dirty = False
+        self._last_save = time.monotonic()
 
     def get(self, source_id: str, relpath: str) -> dict | None:
         rec = self._data.get(source_id, {}).get(relpath)

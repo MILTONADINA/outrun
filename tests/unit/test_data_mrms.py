@@ -73,6 +73,58 @@ def test_read_mrms_gunzips_to_temp_and_cleans(tmp_path):
 
 
 @pytest.mark.req("DATA-04")
+def test_ffg_percent_to_ratio_masks_missing_then_divides():
+    out = mrms.ffg_percent_to_ratio(np.array([-999.0, -3.0, 100.0, 5.0, 150.0]))
+    assert out.dtype == np.float32
+    np.testing.assert_array_equal(np.isnan(out), [True, True, False, False, False])
+    np.testing.assert_allclose(out[2:], [1.0, 0.05, 1.5], rtol=1e-6)
+    da = mrms.ffg_percent_to_ratio(xr.DataArray(np.array([[-999.0, 100.0]]), dims=("latitude", "longitude")))
+    assert isinstance(da, xr.DataArray) and np.isnan(da.values[0, 0]) and da.values[0, 1] == pytest.approx(1.0)
+    assert mrms.is_ffg_product("FLASH_QPE_FFG01H_00.00") and mrms.is_ffg_product("FLASH_QPE_FFG03H_00.00")
+    assert not mrms.is_ffg_product("FLASH_QPE_ARIMAX_00.00")
+    assert not mrms.is_ffg_product(mrms.QPE_PRODUCT)
+
+
+@pytest.mark.req("DATA-04")
+@pytest.mark.parametrize(
+    ("product", "expected"),
+    [
+        ("FLASH_QPE_FFG01H_00.00", [np.nan, np.nan, 1.0, 0.05]),
+        ("FLASH_QPE_FFG03H_00.00", [np.nan, np.nan, 1.0, 0.05]),
+        ("FLASH_QPE_ARIMAX_00.00", [np.nan, np.nan, 100.0, 5.0]),  # ARI in years: never rescaled
+        ("MultiSensor_QPE_01H_Pass2_00.00", [np.nan, np.nan, 100.0, 5.0]),  # QPE in mm: never rescaled
+    ],
+)
+def test_read_mrms_converts_ffg_percent_only(tmp_path, product, expected):
+    raw = tmp_path / f"MRMS_{product}_20230715-030000.grib2.gz"
+    raw.write_bytes(gzip.compress(b"GRIB-PAYLOAD"))
+
+    def decoder(p):
+        return xr.DataArray(np.array([-999.0, -3.0, 100.0, 5.0]), dims=("longitude",))
+
+    da = read_mrms(raw, decoder=decoder)
+    np.testing.assert_allclose(da.values, expected, rtol=1e-6)  # NaN positions must match too
+    plain = tmp_path / f"MRMS_{product}_20230715-030000.grib2"
+    plain.write_bytes(b"GRIB-PAYLOAD")
+    np.testing.assert_allclose(read_mrms(plain, decoder=decoder).values, expected, rtol=1e-6)
+
+
+@pytest.mark.req("DATA-04")
+def test_read_mrms_rejects_unparsable_ffg_name(tmp_path):
+    """An FFG file under a non-MRMS name would keep its percent values (0-255), so it must fail loudly."""
+
+    def decoder(p):
+        return xr.DataArray(np.array([-999.0, 100.0]), dims=("longitude",))
+
+    renamed = tmp_path / "FLASH_QPE_FFG01H_00.00.grib2.gz"
+    renamed.write_bytes(gzip.compress(b"GRIB-PAYLOAD"))
+    with pytest.raises(ValueError):
+        read_mrms(renamed, decoder=decoder)
+    other = tmp_path / "some_qpe_file.grib2"  # not an FFG name: only cleaned, no error
+    other.write_bytes(b"GRIB-PAYLOAD")
+    np.testing.assert_allclose(read_mrms(other, decoder=decoder).values, [np.nan, 100.0])
+
+@pytest.mark.req("DATA-04")
 def test_crop_latlon_descending_lat_and_0_360_lon():
     lat = np.arange(37.0, 32.9, -0.5)  # 37.0 .. 33.0 descending
     lon = np.arange(260.0, 264.01, 0.5)  # -100 .. -96 in 0-360
