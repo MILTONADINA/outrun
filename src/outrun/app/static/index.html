@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Outrun</title>
+  <!-- Placeholder page (T0). Vendored MapLibre GL JS 4 + pmtiles.js go in static/vendor/ (T6). -->
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Outrun</h1>
+    <input id="city-box" type="search" placeholder="Any US city">
+    <nav>
+      <button data-tab="forecast">Forecast</button>
+      <button data-tab="route">Safe route</button>
+      <button data-tab="shelters">Shelters</button>
+      <button data-tab="evac">City evacuation</button>
+      <button data-tab="dispatch">Dispatch</button>
+      <button data-tab="results">Models and results</button>
+    </nav>
+  </header>
+  <main>
+    <div id="map"></div>
+    <aside id="panel"></aside>
+  </main>
+  <script src="static/app.js"></script>
+</body>
+</html>

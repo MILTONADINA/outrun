@@ -1,0 +1,184 @@
+# Data manifest (committed). One entry per source. `outrun fetch` reads this file.
+# approx_bytes are DESIGN estimates; [CANDIDATE] sizes are measured in T1/T3 and updated here.
+# sha256 is filled in after the first verified download (TBD until then).
+# target: hdd = RAW on the external HDD ($OUTRUN_RAW, default /Volumes/OutrunRaw);
+#         ssd = PROC on the internal SSD ($OUTRUN_PROC); stream = byte-range fetched, cropped in memory, never stored raw.
+
+version: 1
+sources:
+  - id: sevir_catalog
+    desc: SEVIR CATALOG.csv
+    url: s3://sevir/CATALOG.csv
+    access: s3_unsigned
+    approx_bytes: 34000000
+    license: "CC BY 4.0 [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: sevir_vil_2018_2019
+    desc: SEVIR VIL STORMEVENTS h5, 2018 and 2019 only [CANDIDATE size; T1 aws s3 ls]
+    url: s3://sevir/data/vil/{2018,2019}/
+    access: s3_unsigned
+    approx_bytes: 65000000000
+    license: "CC BY 4.0 [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: sevir_ir107_2018_2019
+    desc: SEVIR GOES-16 IR107 h5, 2018-2019 (60 GB rule, DESIGN 3.1) [CANDIDATE size]
+    url: s3://sevir/data/ir107/{2018,2019}/
+    access: s3_unsigned
+    approx_bytes: 60000000000
+    license: "CC BY 4.0 [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: tornet_catalog
+    desc: TorNet catalog.csv
+    url: https://zenodo.org/  # TorNet record; exact record id/file list checked in T1 [CANDIDATE]
+    access: http
+    approx_bytes: 10000000
+    license: CC BY 4.0
+    target: hdd
+    sha256: TBD
+  - id: tornet_2019_2015_2016
+    desc: TorNet yearly tarballs 2019 -> 2015 -> 2016 [CANDIDATE sizes; T1]
+    url: https://zenodo.org/  # per-year records, listed in T1
+    access: http
+    approx_bytes: 51000000000
+    license: CC BY 4.0
+    target: hdd
+    sha256: TBD
+  - id: ndws
+    desc: Next Day Wildfire Spread TFRecords (official train/eval/test)
+    url: kaggle://fantineh/next-day-wildfire-spread
+    access: kaggle
+    approx_bytes: 3960000000
+    license: CC BY 4.0
+    target: hdd
+    sha256: TBD
+  - id: wsts
+    desc: WildfireSpreadTS whole archive (only 2021 extracted) [CANDIDATE layout; T1]
+    url: https://zenodo.org/records/8006177
+    access: http
+    approx_bytes: 48000000000
+    license: CC BY 4.0
+    target: hdd
+    sha256: TBD
+  - id: mrms_qpe_01h_pass2
+    desc: MRMS MultiSensor_QPE_01H_Pass2 CONUS, Apr-Sep 2021-2025 (21,960 files)
+    url: s3://noaa-mrms-pds/CONUS/MultiSensor_QPE_01H_Pass2_00.00/
+    access: s3_unsigned
+    approx_bytes: 10000000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: mrms_flash
+    desc: MRMS FLASH QPE/FFG ratio 1h/3h + QPE ARI, event windows only, cap 20 GB [CANDIDATE product names; T3]
+    url: s3://noaa-mrms-pds/CONUS/
+    access: s3_unsigned
+    approx_bytes: 20000000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: hrrr_ice
+    desc: HRRR wrfsfc f01, 3-hourly cycles, 9 fields, winters 2020-21..2024-25, ice-belt crop; cap 80 GB streamed
+    url: s3://noaa-hrrr-bdp-pds/
+    access: herbie_byte_range
+    approx_bytes: 42000000000   # streamed; ~14 GB kept on SSD as fp16 zarr
+    license: Public domain (NOAA)
+    target: stream
+    sha256: n/a
+  - id: hrrr_smoke
+    desc: HRRR-Smoke f01+f06, 6-hourly cycles, MASSDEN/HPBL/UGRD/VGRD, 2022-2024; cap 60 GB streamed
+    url: s3://noaa-hrrr-bdp-pds/
+    access: herbie_byte_range
+    approx_bytes: 35000000000   # streamed; ~2 GB kept
+    license: Public domain (NOAA)
+    target: stream
+    sha256: n/a
+  - id: storm_events
+    desc: NCEI Storm Events details CSVs 2019-2026 [CANDIDATE 2025/2026 completeness; T1]
+    url: https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/
+    access: http
+    approx_bytes: 600000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: spc_tornado
+    desc: SPC tornado tracks CSV (observed truth only; never a model input)
+    url: https://www.spc.noaa.gov/wcm/
+    access: http
+    approx_bytes: 20000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: nws_zones
+    desc: NWS public forecast zone shapefile
+    url: https://www.weather.gov/gis/PublicZones
+    access: http
+    approx_bytes: 50000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: hms_smoke
+    desc: NOAA HMS daily smoke polygons 2022-2024 (satellite input)
+    url: https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/
+    access: http
+    approx_bytes: 500000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: aqs_pm25_hourly
+    desc: EPA AQS hourly_88101_{2022,2023,2024}.zip (+2025 if posted [CANDIDATE; T1])
+    url: https://aqs.epa.gov/aqsweb/airdata/
+    access: http
+    approx_bytes: 210000000
+    license: Public domain (US EPA)
+    target: hdd
+    sha256: TBD
+  - id: etopo_2022_30s
+    desc: ETOPO 2022 30 arc-second, CONUS crop [CANDIDATE < 1 GB]
+    url: https://www.ncei.noaa.gov/products/etopo-global-relief-model
+    access: http
+    approx_bytes: 1000000000
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: usgs_3dep_10m_okc
+    desc: USGS 3DEP 1/3 arc-second (10 m) tiles covering OKC_BBOX (6 tiles)
+    url: https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/TIFF/current/
+    access: http
+    approx_bytes: 2600000000
+    license: Public domain (USGS)
+    target: hdd
+    sha256: TBD
+  - id: osm_oklahoma
+    desc: Geofabrik oklahoma-latest.osm.pbf
+    url: https://download.geofabrik.de/north-america/us/oklahoma-latest.osm.pbf
+    access: http
+    approx_bytes: 162000000
+    license: ODbL 1.0
+    target: hdd
+    sha256: TBD
+  - id: hifld_facilities
+    desc: HIFLD NSS shelters, hospitals, fire/EMS stations, schools (Parquet mirror; fallbacks Data Rescue, OSM)
+    url: https://source.coop/seerai/hifld
+    access: http
+    approx_bytes: 500000000
+    license: "Public domain (US government) [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: census_2020_block_groups
+    desc: 2020 Census block-group population + TIGER geometries (OK)
+    url: https://www2.census.gov/geo/tiger/TIGER2020/BG/
+    access: http
+    approx_bytes: 100000000
+    license: Public domain (US government)
+    target: hdd
+    sha256: TBD
+  - id: protomaps_basemap
+    desc: Protomaps PMTiles extract for OKC (+ demo-fire town) for the offline app [estimate 60-150 MB; T6]
+    url: https://build.protomaps.com/
+    access: http
+    approx_bytes: 150000000
+    license: ODbL 1.0 (OSM data)
+    target: ssd
+    sha256: TBD

@@ -1,0 +1,27 @@
+# Spatial domains and the shared GRID (DESIGN 3 "Shared definitions", 1.1).
+grid:
+  crs: "EPSG:5070"        # CONUS Albers equal area
+  resolution_m: 1000      # 1 km cells
+
+domains:
+  OK_BBOX:                # Oklahoma + 50 km buffer applied in code
+    lon: [-103.1, -94.4]
+    lat: [33.6, 37.1]
+    buffer_km: 50
+  OKC_BBOX:               # demo metro: El Reno, Yukon, OKC, Edmond, Moore, Norman, Midwest City
+    lon: [-98.10, -97.10]
+    lat: [35.10, 35.80]
+  ICE_BELT:               # ice model training box (CONUS subset chosen for HRRR volume)
+    lon: [-103.0, -88.0]
+    lat: [32.0, 42.0]
+    resolution_km: 3
+  CONUS:
+    lon: [-125.0, -66.5]
+    lat: [24.0, 50.0]
+
+radars:
+  KTLX: {lat: 35.333, lon: -97.278}   # Oklahoma City NEXRAD (tornado case chips within 100 km)
+
+any_city_acceptance:
+  - "Tulsa, Oklahoma, USA"
+  # + the WSTS 2021 demo-fire town, chosen in T13 [CANDIDATE]

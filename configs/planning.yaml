@@ -1,0 +1,59 @@
+# Planning assumptions (DESIGN 4.4-4.6, Decision 5). Each is flagged "assumed" in the UI and gets a
+# +-50% sensitivity row in the report.
+demand:
+  public_shelter_rate: 0.10      # share of population seeking a public shelter
+  evacuation_compliance: 0.9
+  persons_per_vehicle: 2.5
+  evacuation_polygon_min_p: 0.3  # any hazard p >= 0.3, plus buffer
+  evacuation_polygon_buffer_km: 2
+
+shelters:
+  school_capacity_default: 500   # when capacity unknown (assumed)
+  fire_station_capacity_default: 50
+  min_shelters_before_fallback: 20
+  remove_if_hazard_r_above: 0.5  # fire/tornado/flood r > 0.5 (smoke r > 0.5 for the sensitive profile)
+  unserved_cost_factor: 10       # "unserved" arc at 10x the max cost
+
+roads:
+  capacity_veh_per_h_per_lane:
+    motorway: 1800
+    trunk: 1800
+    primary: 900
+    secondary: 900
+    other: 600
+  edge_sample_spacing_m: 100
+
+astar:
+  max_labels_per_node: 8
+  multi_goal_nearest: 20
+  alt_landmarks: 8
+  shelter_in_place_hardened_drive_min: 5
+
+evacuation:
+  packet_max_vehicles: 50
+  k_paths: 4
+  path_diversity_penalty: 1.4
+  waves: 4
+  wave_minutes: 30
+  bpr_alpha: 0.15
+  bpr_beta: 4
+  lambda_exposure: 1.0           # veh-h per risk-veh-h
+  lambda_clear_per_vehicle: 0.1  # lambda_C = 0.1 x total vehicles
+  clearance_percentile: 95
+  sa:
+    move_probs: {repick_path: 0.75, repick_wave: 0.20, swap_adjacent_waves: 0.05}
+    warmup_moves: 500
+    warmup_accept: 0.8
+    alpha: 0.9995
+    iterations: 40000
+    restarts: 5
+  msa_iterations: 50
+
+emergency:
+  ev_speedup_vs_congested: 1.2
+  max_incidents: 3
+  pareto_lambdas: [0, 0.25, 0.5, 1, 2]
+
+routing_eval:
+  od_pairs_per_scenario: 500
+  bootstrap_resamples: 1000

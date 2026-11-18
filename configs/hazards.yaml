@@ -1,0 +1,68 @@
+# Hazard policies and exposure weights (DESIGN 1.2, 3.x, 4.2). Loaded into outrun.core.policy.HazardPolicy.
+# Profiles: civilian, sensitive, ev. block_at: P >= value makes the edge impassable for that profile (null = never).
+# speed_factor(p) = 1 - slope * p, clipped to [1/3, 1]; the clock divides by it (slows down), never speeds up.
+# exposure_weight w_h^p >= 0 multiplies the generalized cost: c = tau * (1 + sum_h w_h^p * r_h).
+# beyond_horizon: what the layer does after valid_until (hold | decay | drop). Routing window: 12 slots x 15 min.
+
+slot_minutes: 15
+n_slots: 12
+clock_cap_factor: 3.0          # clock time capped at 3x free flow
+lambda_default: 1.0            # UI "safer <-> faster" multiplier on all weights
+weight_sensitivity: [0.5, 2.0] # report sweep
+
+hazards:
+  storm:
+    native_horizon_min: 60
+    block_at: {civilian: null, sensitive: null, ev: null}
+    speed_factor_slope: 0.3
+    exposure_weight: {civilian: 2, sensitive: 2, ev: 0.5}
+    beyond_horizon: decay
+    decay_tau_min: 30
+    decay_zero_after_min: 120   # P = 0 after 120 min
+    risk_threshold_vil: 133     # r_storm = calibrated P(VIL >= 133)
+  tornado:
+    native_horizon_min: 30
+    block_at: {civilian: 0.5, sensitive: 0.5, ev: 0.5}
+    block_within_min: 20        # block_at applies to slots within 20 min of issue
+    speed_factor_slope: 0.0
+    exposure_weight: {civilian: 20, sensitive: 20, ev: 5}
+    beyond_horizon: drop
+    decay_tau_min: null
+    blocked_linger_min: 15      # blocked cells keep blocking 15 min after the swath passes (debris)
+  flood:
+    native_horizon_min: 360
+    block_at: {civilian: 0.4, sensitive: 0.4, ev: 0.7}   # at low-water crossings ("Turn Around, Don't Drown")
+    speed_factor_slope: 0.4
+    exposure_weight: {civilian: 10, sensitive: 10, ev: 3}
+    beyond_horizon: hold
+    decay_tau_min: null
+    crossing_multiplier: 1.5    # p' = min(1, 1.5 p) on low-water crossings
+    depression_multiplier: 2.0  # p' = min(1, 2 p) if > 2 m below the 300 m-radius median elevation
+    depression_drop_m: 2.0
+    depression_radius_m: 300
+    bridge_prob: 0.0
+  wildfire:
+    native_horizon_min: 1440
+    block_at: {civilian: 0.5, sensitive: 0.5, ev: 0.7}
+    speed_factor_slope: 0.0
+    exposure_weight: {civilian: 20, sensitive: 20, ev: 5}
+    beyond_horizon: hold
+    decay_tau_min: null
+  ice:
+    native_horizon_min: 180
+    block_at: {civilian: null, sensitive: null, ev: null}
+    speed_factor_slope: 0.5     # at most 2x slower
+    exposure_weight: {civilian: 3, sensitive: 3, ev: 1}
+    beyond_horizon: hold
+    decay_tau_min: null
+    bridge_multiplier: 1.5      # bridges freeze first: p' = min(1, 1.5 p) (ablated)
+  smoke:
+    native_horizon_min: 360
+    block_at: {civilian: null, sensitive: null, ev: null}   # exposure only
+    speed_factor_slope: 0.0
+    exposure_weight: {civilian: 0.5, sensitive: 5, ev: 0}
+    beyond_horizon: hold
+    decay_tau_min: null
+    pm25_low: 35.4              # r_smoke = clip((PM - 35.4) / (150.4 - 35.4), 0, 1)
+    pm25_high: 150.4
+    shelter_deprioritize_r: 0.5

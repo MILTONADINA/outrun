@@ -1,0 +1,6 @@
+/* Outrun placeholder styles (T0). */
+html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+header { display: flex; gap: 1rem; align-items: center; padding: 0.5rem 1rem; }
+main { display: flex; height: calc(100% - 4rem); }
+#map { flex: 1; background: #1b1f24; }
+#panel { width: 22rem; overflow: auto; }

@@ -1,0 +1,25 @@
+# Data, models and logs are never committed (data/manifest.yaml is the exception)
+data/*
+!data/manifest.yaml
+models/
+logs/
+scenarios/**/*.zarr
+*.mp4
+
+# Python / tooling
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json
