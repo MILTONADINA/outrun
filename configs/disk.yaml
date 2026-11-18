@@ -1,0 +1,11 @@
+# Disk budget caps read by outrun.data.disk.load_disk_budget (specs/01-data.md DATA-14).
+#
+# Storage decision (Milton, Nov 17 2026): there is no external HDD. RAW downloads and PROC outputs both live on
+# the internal SSD, outside the repo:
+#   OUTRUN_RAW=/Users/milto/OutrunData/raw    ("hdd" target in data/manifest.yaml)
+#   OUTRUN_PROC=/Users/milto/OutrunData/proc  ("ssd" target)
+# The SSD had about 568 GB free in total, so the DESIGN 7.3 caps (375 + 225 GB) are lowered to keep a margin on
+# the one shared disk. The "hdd" key still means the RAW root; no code path assumes a separate physical drive.
+disk:
+  hdd_cap_gb: 300   # RAW root cap
+  ssd_cap_gb: 150   # PROC root cap

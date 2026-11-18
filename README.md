@@ -23,6 +23,19 @@ make test           # unit tests (synthetic data only, offline)
 make demo           # offline map app on precomputed scenarios
 ```
 
+## Data location
+
+Downloads (RAW) and processed data (PROC) live outside the repo. On the project Mac both are on the internal SSD:
+
+```bash
+export OUTRUN_RAW=/Users/milto/OutrunData/raw     # raw downloads, read once, never modified
+export OUTRUN_PROC=/Users/milto/OutrunData/proc   # memmaps, zarr, parquet, graphs
+```
+
+Put these lines in `~/.zshrc` (or set them per command). Without them the code falls back to `/Volumes/OutrunRaw`
+and `data/proc`. Disk caps are in `configs/disk.yaml`. The NDWS dataset comes from Kaggle and needs an API
+token in `~/.kaggle/kaggle.json` (Kaggle -> Settings -> API -> Create New Token, then `chmod 600` the file).
+
 ## Docs
 
 - `docs/DESIGN.md`: full design

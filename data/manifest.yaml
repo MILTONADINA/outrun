@@ -1,8 +1,11 @@
 # Data manifest (committed). One entry per source. `outrun fetch` reads this file.
-# approx_bytes are DESIGN estimates; [CANDIDATE] sizes are measured in T1/T3 and updated here.
+# approx_bytes are DESIGN estimates unless marked [MEASURED Nov 17] (exact bytes from aws s3 ls / Zenodo API /
+# Kaggle API / HTTP Content-Length on 2026-11-17, T1). Remaining [CANDIDATE] sizes are measured in T3 and updated here.
 # sha256 is filled in after the first verified download (TBD until then).
-# target: hdd = RAW on the external HDD ($OUTRUN_RAW, default /Volumes/OutrunRaw);
-#         ssd = PROC on the internal SSD ($OUTRUN_PROC); stream = byte-range fetched, cropped in memory, never stored raw.
+# target: hdd = the RAW root. It defaults via $OUTRUN_RAW; on this machine it is /Users/milto/OutrunData/raw on the
+#         internal SSD (storage decision Nov 17: there is no external HDD; the "hdd" name is kept, cap 300 GB).
+#         ssd = PROC root ($OUTRUN_PROC; on this machine /Users/milto/OutrunData/proc, cap 150 GB);
+#         stream = byte-range fetched, cropped in memory, never stored raw.
 
 version: 1
 sources:
@@ -10,39 +13,42 @@ sources:
     desc: SEVIR CATALOG.csv
     url: s3://sevir/CATALOG.csv
     access: s3_unsigned
-    approx_bytes: 34000000
+    approx_bytes: 33838047   # [MEASURED Nov 17]
     license: "CC BY 4.0 [CANDIDATE]"
     target: hdd
     sha256: TBD
   - id: sevir_vil_2018_2019
-    desc: SEVIR VIL STORMEVENTS h5, 2018 and 2019 only [CANDIDATE size; T1 aws s3 ls]
-    url: s3://sevir/data/vil/{2018,2019}/
+    desc: SEVIR VIL STORMEVENTS h5, 2018 and 2019 only (4 files; RANDOMEVENTS skipped) [MEASURED Nov 17]
+    # Exact-file braces on purpose: the whole vil/{2018,2019}/ prefixes are 116.87 GB because they include RANDOMEVENTS.
+    url: s3://sevir/data/vil/{2018/SEVIR_VIL_STORMEVENTS_2018,2019/SEVIR_VIL_STORMEVENTS_2019}_{0101_0630,0701_1231}.h5
     access: s3_unsigned
-    approx_bytes: 65000000000
+    approx_bytes: 21907289712   # [MEASURED Nov 17] 5729709818 + 6119878934 + 6148780350 + 3908920610
     license: "CC BY 4.0 [CANDIDATE]"
     target: hdd
     sha256: TBD
   - id: sevir_ir107_2018_2019
-    desc: SEVIR GOES-16 IR107 h5, 2018-2019 (60 GB rule, DESIGN 3.1) [CANDIDATE size]
-    url: s3://sevir/data/ir107/{2018,2019}/
+    desc: SEVIR GOES-16 IR107 STORMEVENTS h5, 2018-2019 (4 files; 11.4 GB < 60 GB rule, nothing dropped) [MEASURED Nov 17]
+    # Whole ir107/{2018,2019}/ prefixes are 48.92 GB incl. RANDOMEVENTS; only STORMEVENTS are fetched.
+    url: s3://sevir/data/ir107/{2018/SEVIR_IR107_STORMEVENTS_2018,2019/SEVIR_IR107_STORMEVENTS_2019}_{0101_0630,0701_1231}.h5
     access: s3_unsigned
-    approx_bytes: 60000000000
+    approx_bytes: 11398028094   # [MEASURED Nov 17] 3005755520 + 3265868624 + 2630036592 + 2496367358
     license: "CC BY 4.0 [CANDIDATE]"
     target: hdd
     sha256: TBD
   - id: tornet_catalog
-    desc: TorNet catalog.csv
-    url: https://zenodo.org/  # TorNet record; exact record id/file list checked in T1 [CANDIDATE]
+    desc: TorNet catalog.csv (Zenodo record 12636522 "TorNet 2013 (and catalog)", md5 de0beb814845ba897bbb4e11b0bf563e)
+    url: https://zenodo.org/records/12636522/files/catalog.csv
     access: http
-    approx_bytes: 10000000
+    approx_bytes: 38245403   # [MEASURED Nov 17]
     license: CC BY 4.0
     target: hdd
     sha256: TBD
   - id: tornet_2019_2015_2016
-    desc: TorNet yearly tarballs 2019 -> 2015 -> 2016 [CANDIDATE sizes; T1]
-    url: https://zenodo.org/  # per-year records, listed in T1
+    desc: TorNet yearly tarballs 2019 -> 2015 -> 2016 (tornet_YYYY.tar.gz; records 12655716, 12655151, 12655179) [MEASURED Nov 17]
+    # md5: 2019 9b0832e10a8b9b7682f6b99a30ab0019, 2015 7251feab3c571c71fcca8745d8431c7d, 2016 e12fab8818d68990f22467f5371aac97
+    url: https://zenodo.org/records/{12655716,12655151,12655179}/files/
     access: http
-    approx_bytes: 51000000000
+    approx_bytes: 51861035495   # [MEASURED Nov 17] 18219887934 + 17395624045 + 16245523516
     license: CC BY 4.0
     target: hdd
     sha256: TBD
@@ -50,15 +56,17 @@ sources:
     desc: Next Day Wildfire Spread TFRecords (official train/eval/test)
     url: kaggle://fantineh/next-day-wildfire-spread
     access: kaggle
-    approx_bytes: 3960000000
+    approx_bytes: 3955889585   # [MEASURED Nov 17] 19 tfrecords (15 train, 2 eval, 2 test), Kaggle API listing
     license: CC BY 4.0
     target: hdd
     sha256: TBD
   - id: wsts
-    desc: WildfireSpreadTS whole archive (only 2021 extracted) [CANDIDATE layout; T1]
-    url: https://zenodo.org/records/8006177
+    desc: WildfireSpreadTS whole archive WildfireSpreadTS.zip (only 2021 extracted) [MEASURED Nov 17 size; CANDIDATE internal layout]
+    # Record 8006177 is the latest version; files: WildfireSpreadTS.zip 48359369821 B (md5 dc1a04e63ccc70037b277d585b8fe761)
+    # and WildfireSpreadTS_Documentation.pdf 7841847 B. Single zip, so a 2021-only download is not possible.
+    url: https://zenodo.org/records/8006177/files/WildfireSpreadTS.zip
     access: http
-    approx_bytes: 48000000000
+    approx_bytes: 48359369821   # [MEASURED Nov 17]
     license: CC BY 4.0
     target: hdd
     sha256: TBD
@@ -95,18 +103,21 @@ sources:
     target: stream
     sha256: n/a
   - id: storm_events
-    desc: NCEI Storm Events details CSVs 2019-2026 [CANDIDATE 2025/2026 completeness; T1]
+    desc: NCEI Storm Events details CSVs 2019-2026 (8 files exist [MEASURED Nov 17]; 2026 file c20261026 is a partial year; 2025/2026 completeness [CANDIDATE])
+    # Files (Nov 17): StormEvents_details-ftp_v1.0_d{2019,2020,2021}_c20260323, d2022_c20260625, d2023_c20260323,
+    # d2024_c20260728, d2025_c20260819, d2026_c20261026 (.csv.gz). The c-stamps change when NCEI republishes.
+    # NOTE: an http directory URL has no lister in fetch.py (only s3:// and zenodo); see NOTES T1.
     url: https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/
     access: http
-    approx_bytes: 600000000
+    approx_bytes: 91829403   # [MEASURED Nov 17] sum of the 8 .csv.gz files
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
   - id: spc_tornado
-    desc: SPC tornado tracks CSV (observed truth only; never a model input)
-    url: https://www.spc.noaa.gov/wcm/
+    desc: SPC tornado tracks CSV 1950-2025 (observed truth only; never a model input) [MEASURED Nov 17]
+    url: https://www.spc.noaa.gov/wcm/data/1950-2025_actual_tornadoes.csv
     access: http
-    approx_bytes: 20000000
+    approx_bytes: 9023445   # [MEASURED Nov 17]
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
@@ -127,10 +138,12 @@ sources:
     target: hdd
     sha256: TBD
   - id: aqs_pm25_hourly
-    desc: EPA AQS hourly_88101_{2022,2023,2024}.zip (+2025 if posted [CANDIDATE; T1])
+    desc: EPA AQS hourly_88101_{2022,2023,2024,2025}.zip (2025 posted [MEASURED Nov 17]; 2025 completeness [CANDIDATE])
+    # Sizes: 2022 75836309, 2023 76998372, 2024 66347589, 2025 68558274 (all Last-Modified 2026-07-13).
+    # daily_88101_2025.zip (8647326) and hourly/daily 2026 also exist. NOTE: http directory URL has no lister; see NOTES T1.
     url: https://aqs.epa.gov/aqsweb/airdata/
     access: http
-    approx_bytes: 210000000
+    approx_bytes: 287740544   # [MEASURED Nov 17] hourly 2022-2025
     license: Public domain (US EPA)
     target: hdd
     sha256: TBD
@@ -154,7 +167,7 @@ sources:
     desc: Geofabrik oklahoma-latest.osm.pbf
     url: https://download.geofabrik.de/north-america/us/oklahoma-latest.osm.pbf
     access: http
-    approx_bytes: 162000000
+    approx_bytes: 170661998   # [MEASURED Nov 17] (Last-Modified 2026-11-18 04:01 UTC; changes daily)
     license: ODbL 1.0
     target: hdd
     sha256: TBD
