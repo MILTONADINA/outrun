@@ -106,7 +106,8 @@ sources:
     desc: NCEI Storm Events details CSVs 2019-2026 (8 files exist [MEASURED Nov 17]; 2026 file c20261026 is a partial year; 2025/2026 completeness [CANDIDATE])
     # Files (Nov 17): StormEvents_details-ftp_v1.0_d{2019,2020,2021}_c20260323, d2022_c20260625, d2023_c20260323,
     # d2024_c20260728, d2025_c20260819, d2026_c20261026 (.csv.gz). The c-stamps change when NCEI republishes.
-    # NOTE: an http directory URL has no lister in fetch.py (only s3:// and zenodo); see NOTES T1.
+    # Directory URL: fetch.py HTTP_INDEX_RULES["storm_events"] keeps only the details files d2019..d2026 (the
+    # directory also has fatalities/locations files back to 1950). The 2026 file is a partial year (on purpose).
     url: https://www.ncei.noaa.gov/pub/data/swdi/stormevents/csvfiles/
     access: http
     approx_bytes: 91829403   # [MEASURED Nov 17] sum of the 8 .csv.gz files
@@ -122,25 +123,32 @@ sources:
     target: hdd
     sha256: TBD
   - id: nws_zones
-    desc: NWS public forecast zone shapefile
-    url: https://www.weather.gov/gis/PublicZones
+    desc: NWS public forecast zone shapefile z_16ap26.zip (effective 16 Apr 2026, current on weather.gov/gis/PublicZones) [MEASURED Nov 18]
+    # Page lists 4157 zones, md5 004dc6501dc3d50e7b36652cb9d02bd3. The previous file z_18mr25.zip is superseded.
+    url: https://www.weather.gov/source/gis/Shapefiles/WSOM/z_16ap26.zip
     access: http
-    approx_bytes: 50000000
+    approx_bytes: 26465980   # [MEASURED Nov 18]
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
-  - id: hms_smoke
-    desc: NOAA HMS daily smoke polygons 2022-2024 (satellite input)
-    url: https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/
+  - id: hms_smoke_polygons
+    desc: NOAA HMS daily smoke polygons 2022-2024, one shapefile zip per day (1096 files) (satellite input) [MEASURED Nov 18]
+    # Layout: Shapefile/YYYY/MM/hms_smokeYYYYMMDD.zip (36 month folders, 1096 daily zips, 5-60 KB each).
+    # Fetchable: fetch.py HTTP_INDEX_RULES["hms_smoke_polygons"] keeps hms_smoke*.zip in each month folder. The id is
+    # not plain "hms_smoke" because test_default_lister_refuses_an_http_directory_without_a_rule uses that id as
+    # its rule-less example.
+    url: https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Smoke_Polygons/Shapefile/{2022,2023,2024}/{01,02,03,04,05,06,07,08,09,10,11,12}/
     access: http
-    approx_bytes: 500000000
+    approx_bytes: 18858040   # [MEASURED Nov 18] exact HEAD sum of the 1096 zips
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
   - id: aqs_pm25_hourly
     desc: EPA AQS hourly_88101_{2022,2023,2024,2025}.zip (2025 posted [MEASURED Nov 17]; 2025 completeness [CANDIDATE])
     # Sizes: 2022 75836309, 2023 76998372, 2024 66347589, 2025 68558274 (all Last-Modified 2026-07-13).
-    # daily_88101_2025.zip (8647326) and hourly/daily 2026 also exist. NOTE: http directory URL has no lister; see NOTES T1.
+    # daily_88101_2025.zip (8647326) and hourly/daily 2026 also exist but are not fetched.
+    # Directory URL: fetch.py HTTP_INDEX_RULES["aqs_pm25_hourly"] reads the links on download_files.html (the
+    # directory listing itself answers 403) and keeps only hourly_88101_202[2-5].zip.
     url: https://aqs.epa.gov/aqsweb/airdata/
     access: http
     approx_bytes: 287740544   # [MEASURED Nov 17] hourly 2022-2025
@@ -148,18 +156,23 @@ sources:
     target: hdd
     sha256: TBD
   - id: etopo_2022_30s
-    desc: ETOPO 2022 30 arc-second, CONUS crop [CANDIDATE < 1 GB]
-    url: https://www.ncei.noaa.gov/products/etopo-global-relief-model
+    desc: ETOPO 2022 30 arc-second surface elevation GeoTIFF, global (cropped to CONUS in prep) [MEASURED Nov 18]
+    # At 30s NCEI publishes only one global tile (N90W180); the 15s product is the tiled one. 1.59 GB > the
+    # DESIGN "< 1 GB" CONUS-crop candidate, because the crop is made after download.
+    url: https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/30s/30s_surface_elev_gtif/ETOPO_2022_v1_30s_N90W180_surface.tif
     access: http
-    approx_bytes: 1000000000
+    approx_bytes: 1585813987   # [MEASURED Nov 18]
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
   - id: usgs_3dep_10m_okc
-    desc: USGS 3DEP 1/3 arc-second (10 m) tiles covering OKC_BBOX (6 tiles)
-    url: https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/TIFF/current/
-    access: http
-    approx_bytes: 2600000000
+    desc: USGS 3DEP 1/3 arc-second (10 m) GeoTIFF tiles covering OKC_BBOX (2 tiles, n36w098 and n36w099) [MEASURED Nov 18]
+    # OKC_BBOX (configs/domains.yaml) is lon -98.10..-97.10, lat 35.10..35.80, no buffer. 1-degree tiles are named by
+    # their NW corner, so n36w098 (lon -98..-97, lat 35..36) and n36w099 (lon -99..-98) cover it. DESIGN said 6.
+    # prd-tnm.s3.amazonaws.com is a public AWS bucket, so the unsigned S3 path (with a lister) is used.
+    url: s3://prd-tnm/StagedProducts/Elevation/13/TIFF/current/{n36w098/USGS_13_n36w098,n36w099/USGS_13_n36w099}.tif
+    access: s3_unsigned
+    approx_bytes: 883497020   # [MEASURED Nov 18] 443623041 + 439873979
     license: Public domain (USGS)
     target: hdd
     sha256: TBD
@@ -171,19 +184,66 @@ sources:
     license: ODbL 1.0
     target: hdd
     sha256: TBD
-  - id: hifld_facilities
-    desc: HIFLD NSS shelters, hospitals, fire/EMS stations, schools (Parquet mirror; fallbacks Data Rescue, OSM)
-    url: https://source.coop/seerai/hifld
+  # HIFLD facilities (was one entry, hifld_facilities). Split Nov 18 into one single-file entry per layer: the
+  # source.coop mirror is S3-compatible but not on AWS (endpoint data.source.coop), so fetch.py's s3_lister cannot list
+  # it, and an http brace list of exact files has no lister. Each layer is one Spark part file; the part-file names
+  # change if the mirror is rebuilt (re-list with an S3 client at endpoint https://data.source.coop, bucket seerai).
+  # Fallbacks: Data Rescue Project HIFLD copies, then OSM amenities (DESIGN 4.x).
+  - id: hifld_shelters
+    desc: HIFLD National Shelter System facilities (NSS; capacity field [CANDIDATE; T11]), source.coop seerai/hifld Parquet mirror [MEASURED Nov 18]
+    url: https://data.source.coop/seerai/hifld/national-shelter-system-facilities/shelter-locations/shelter-locations.parquet/part-00000-tid-5197556120553778283-36940850-fedb-4e12-aff7-d26063f5efd5-741-1-c000.zstd.parquet
     access: http
-    approx_bytes: 500000000
+    approx_bytes: 8458828   # [MEASURED Nov 18]
+    license: "Public domain (US government) [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: hifld_hospitals
+    desc: HIFLD hospitals, source.coop seerai/hifld Parquet mirror [MEASURED Nov 18]
+    url: https://data.source.coop/seerai/hifld/hospitals/hospitals/hospitals.parquet/part-00000-tid-8978295414723239462-2ae7bc80-5966-4613-bce3-0df654e4e41d-155-1-c000.zstd.parquet
+    access: http
+    approx_bytes: 1046082   # [MEASURED Nov 18]
+    license: "Public domain (US government) [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: hifld_fire_ems_stations
+    desc: HIFLD fire and EMS stations (one combined layer on the mirror), source.coop seerai/hifld Parquet mirror [MEASURED Nov 18]
+    url: https://data.source.coop/seerai/hifld/fire-and-emergency-medical-service-ems-stations/fire-stationsems-stations/fire-stationsems-stations.parquet/part-00000-tid-7977766793926817672-2a03bc88-2dfd-4a8d-ac3a-1fefd549728e-481-1-c000.zstd.parquet
+    access: http
+    approx_bytes: 7413796   # [MEASURED Nov 18]
+    license: "Public domain (US government) [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: hifld_public_schools
+    desc: HIFLD public schools, source.coop seerai/hifld Parquet mirror [MEASURED Nov 18]
+    url: https://data.source.coop/seerai/hifld/public-schools/public-schools/public-schools.parquet/part-00000-tid-1969800580966380026-8d89c874-03c0-4b4e-b102-71327611e71c-368-1-c000.zstd.parquet
+    access: http
+    approx_bytes: 11198763   # [MEASURED Nov 18]
+    license: "Public domain (US government) [CANDIDATE]"
+    target: hdd
+    sha256: TBD
+  - id: hifld_private_schools
+    desc: HIFLD private schools, source.coop seerai/hifld Parquet mirror [MEASURED Nov 18]
+    url: https://data.source.coop/seerai/hifld/private-schools/private-schools/private-schools.parquet/part-00000-tid-8824118763146891236-c6f1f7dc-37d0-4112-bbde-6caf582b3e4e-59-1-c000.zstd.parquet
+    access: http
+    approx_bytes: 2285066   # [MEASURED Nov 18]
     license: "Public domain (US government) [CANDIDATE]"
     target: hdd
     sha256: TBD
   - id: census_2020_block_groups
-    desc: 2020 Census block-group population + TIGER geometries (OK)
-    url: https://www2.census.gov/geo/tiger/TIGER2020/BG/
+    desc: TIGER/Line 2020 block groups, Oklahoma (FIPS 40) shapefile zip [MEASURED Nov 18]
+    # Population comes from census_2020_pl94171_ok (split Nov 18: two files in different folders need two
+    # single-file entries, because an http brace list of exact files has no lister in fetch.py).
+    url: https://www2.census.gov/geo/tiger/TIGER2020/BG/tl_2020_40_bg.zip
     access: http
-    approx_bytes: 100000000
+    approx_bytes: 10531223   # [MEASURED Nov 18]
+    license: Public domain (US government)
+    target: hdd
+    sha256: TBD
+  - id: census_2020_pl94171_ok
+    desc: 2020 Census PL 94-171 redistricting file, Oklahoma (legacy pipe-delimited; table P1 total population by block group via the geo header, SUMLEV 150) [MEASURED Nov 18]
+    url: https://www2.census.gov/programs-surveys/decennial/2020/data/01-Redistricting_File--PL_94-171/Oklahoma/ok2020.pl.zip
+    access: http
+    approx_bytes: 24870369   # [MEASURED Nov 18]
     license: Public domain (US government)
     target: hdd
     sha256: TBD

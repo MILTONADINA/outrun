@@ -645,6 +645,10 @@ HTTP_INDEX_RULES: dict[str, dict] = {
         "index_page": "download_files.html",
         "patterns": ("hourly_88101_202[2-5].zip",),
     },
+    "hms_smoke_polygons": {
+        # One daily shapefile zip per month folder (Shapefile/YYYY/MM/hms_smokeYYYYMMDD.zip).
+        "patterns": ("hms_smoke*.zip",),
+    },
 }
 
 

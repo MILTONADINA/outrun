@@ -15,14 +15,24 @@ STATE_FIPS_TO_POSTAL: dict[int, str] = {
 
 def zone_id(state_fips: int, cz_fips: int) -> str:
     """DATA-17. e.g. (40, 25) -> "OKZ025"; unknown state FIPS -> ValueError."""
-    raise NotImplementedError
+    postal = STATE_FIPS_TO_POSTAL.get(int(state_fips))
+    if postal is None:
+        raise ValueError(f"unknown state FIPS {state_fips}")
+    return f"{postal}Z{int(cz_fips):03d}"
 
 
 def zones_from_frame(gdf):
     """DATA-17. Add zone_id = STATE + "Z" + ZONE (3 digits); dissolve duplicates."""
-    raise NotImplementedError
+    gdf = gdf.copy()
+    gdf["zone_id"] = (
+        gdf["STATE"].astype(str).str.strip() + "Z" + gdf["ZONE"].astype(str).str.strip().str.zfill(3)
+    )
+    # A zone split into several rows (islands, shared ids) becomes one (multi)polygon.
+    return gdf.dissolve(by="zone_id", as_index=False)
 
 
 def zone_masks(gdf, x: np.ndarray, y: np.ndarray) -> dict[str, np.ndarray]:
     """DATA-17. {zone_id: (len(y), len(x)) bool mask of cell centres inside/on the zone geometry}."""
-    raise NotImplementedError
+    from outrun.data.spc import rasterize_mask  # same cell-centre "inside or on boundary" rule
+
+    return {zid: rasterize_mask([geom], x, y) for zid, geom in zip(gdf["zone_id"], gdf.geometry, strict=True)}
