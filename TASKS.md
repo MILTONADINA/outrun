@@ -9,7 +9,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T2 (Nov 18) Core: grid, risk, policy (beyond-horizon), scenario, synthetic, calibrate
 - [x] T3 (Nov 18) Readers: HRRR, MRMS, AQS, HMS, DEM; measure HRRR MB/message; [overnight] batch B
 - [x] T4 (Nov 19) Roads: OKC graph, speeds, capacities, bridges, crossings, CSR export
-- [ ] T5 (Nov 19) Cost model + multi-label TD-A* + oracles + `outrun route --place` (checkpoint: CLI A*)
+- [x] T5 (Nov 19) Cost model + multi-label TD-A* + oracles + `outrun route --place` (checkpoint: CLI A*)
 - [ ] T6 (Nov 20) App skeleton on synthetic layers, offline (skeleton milestone)
 - [ ] T7 (Nov 20) Case-study verification; freeze splits + quarantine (SPLIT-01..07) before any training
 - [ ] T8 (Nov 21) Storm: SEVIR preprocessing, persistence + pySTEPS, baseline adapter; [overnight] U-Net
