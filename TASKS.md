@@ -4,9 +4,9 @@ Work top to bottom. For each task: read the spec (and the DESIGN section) -> run
 tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in `CLAUDE.md`.
 
 ## Progress (tick as each task is committed)
-- [ ] T0 (Nov 17) Scaffold: specs 00-16, stubs, red tests, traceability + proposal-matrix tests, CI
+- [x] T0 (Nov 17) Scaffold: specs 00-16, stubs, red tests, traceability + proposal-matrix tests, CI
 - [x] T1 (Nov 17) Fetch + manifest, size inventory, TorNet split rule; [overnight] batch A downloads
-- [ ] T2 (Nov 18) Core: grid, risk, policy (beyond-horizon), scenario, synthetic, calibrate
+- [x] T2 (Nov 18) Core: grid, risk, policy (beyond-horizon), scenario, synthetic, calibrate
 - [ ] T3 (Nov 18) Readers: HRRR, MRMS, AQS, HMS, DEM; measure HRRR MB/message; [overnight] batch B
 - [ ] T4 (Nov 19) Roads: OKC graph, speeds, capacities, bridges, crossings, CSR export
 - [ ] T5 (Nov 19) Cost model + multi-label TD-A* + oracles + `outrun route --place` (checkpoint: CLI A*)

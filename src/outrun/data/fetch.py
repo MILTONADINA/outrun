@@ -6,22 +6,35 @@ transports (requests for HTTP, unsigned boto3 for S3) are thin and exercised onl
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import itertools
 import json
 import os
 import re
 import tempfile
+import time
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
+from functools import partial
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Protocol
+from urllib.parse import urljoin, urlsplit
 
 from outrun.data.manifest import Source
 
 
 class DownloadError(OSError):
     """Bad HTTP status, size mismatch or an existing file of the wrong size (DATA-11)."""
+
+
+class TransientStatusError(DownloadError):
+    """An HTTP status that means "busy, try again later" (429, 500, 502, 503, 504). Still a DownloadError, but
+    ``download(max_retries > 0)`` retries it, because servers such as NCEI often answer 503 under load."""
+
+
+TRANSIENT_STATUSES = frozenset({429, 500, 502, 503, 504})
 
 
 class ChecksumError(OSError):
@@ -67,15 +80,104 @@ class VerifyReport:
     unrecorded: list[str] = field(default_factory=list)
 
 
+def transient_errors() -> tuple[type[BaseException], ...]:
+    """Network errors worth retrying: the connection dropped or timed out, so the server may answer next time.
+
+    Deliberately NOT ``OSError``: ``DownloadError`` (404 and other bad statuses, size mismatch) and
+    ``ChecksumError`` are OSErrors too, and retrying those cannot help. The one DownloadError that is retried is
+    ``TransientStatusError`` (429/5xx: the server is busy). requests/urllib3/botocore are imported lazily, like
+    the default transports.
+    """
+    import http.client
+
+    errors: list[type[BaseException]] = [
+        ConnectionError,
+        TimeoutError,
+        http.client.IncompleteRead,
+        TransientStatusError,
+    ]
+    try:
+        import requests
+
+        errors += [
+            requests.exceptions.ConnectionError,  # not a subclass of the builtin ConnectionError
+            requests.exceptions.ChunkedEncodingError,  # what urllib3's IncompleteRead turns into mid-body
+            requests.exceptions.Timeout,  # ReadTimeout and ConnectTimeout
+        ]
+    except ImportError:
+        pass
+    try:
+        import urllib3.exceptions
+
+        errors += [urllib3.exceptions.ProtocolError, urllib3.exceptions.ReadTimeoutError]
+    except ImportError:
+        pass
+    try:
+        import botocore.exceptions as be
+
+        # S3 downloads: botocore wraps urllib3's errors in its own classes while the body is being read.
+        errors += [
+            be.ResponseStreamingError,
+            be.ReadTimeoutError,
+            be.ConnectTimeoutError,
+            be.EndpointConnectionError,
+            be.ConnectionClosedError,
+            be.IncompleteReadError,
+        ]
+    except ImportError:
+        pass
+    return tuple(errors)
+
+
 def download(
     url: str,
     dest: Path | str,
     transport: Transport,
     expected_sha256: str | None = None,
     expected_size: int | None = None,
+    *,
+    max_retries: int = 0,
+    backoff: float = 2.0,
+    max_backoff: float = 60.0,
+    sleep: Callable[[float], None] = time.sleep,
 ) -> DownloadResult:
-    """DATA-11. Resume from ``dest.name + '.part'``, verify, atomically rename. See spec steps 1-5."""
+    """DATA-11. Resume from ``dest.name + '.part'``, verify, atomically rename. See spec steps 1-5.
+
+    Retry (off by default, so a bare call behaves exactly as DATA-11 says): with ``max_retries > 0`` a transient
+    network error or a busy-server status 429/5xx (see ``transient_errors``) is caught, we wait, and the single attempt runs again. It re-reads the
+    ``.part`` size, so it resumes with a Range request. The bound counts failures *in a row without progress*: an
+    attempt that added bytes to the ``.part`` file resets the count, so a long file that drops every few minutes
+    still finishes, while a dead server gives up after ``max_retries`` retries. The wait doubles each time
+    (``backoff``, ``2*backoff``, ...) up to ``max_backoff`` seconds. Other errors (404 and other bad statuses, size
+    or checksum mismatch) are raised at once. ``sleep`` is injectable so tests do not really wait.
+    """
     dest = Path(dest)
+    part = dest.with_name(dest.name + ".part")
+    retryable = transient_errors() if max_retries > 0 else ()
+    best = part.stat().st_size if part.exists() else 0  # most bytes the .part file has ever held
+    failures = 0
+    while True:
+        try:
+            return _download_once(url, dest, transport, expected_sha256, expected_size)
+        except retryable:
+            after = part.stat().st_size if part.exists() else 0
+            if after > best:  # new bytes beyond anything seen before: real progress, restart the count
+                best, failures = after, 1
+            else:
+                failures += 1
+            if failures > max_retries:
+                raise
+            sleep(min(backoff * 2 ** (failures - 1), max_backoff))
+
+
+def _download_once(
+    url: str,
+    dest: Path,
+    transport: Transport,
+    expected_sha256: str | None,
+    expected_size: int | None,
+) -> DownloadResult:
+    """One attempt of DATA-11 steps 1-5 (one transport request at most)."""
     expected = expected_sha256.lower() if expected_sha256 else None
 
     # 1. A finished file only ever comes from step 5, so it is trusted (or checked against the hash).
@@ -106,6 +208,8 @@ def download(
             mode = "ab"
         elif resp.status == 200:
             mode = "wb"  # the server ignored the range: restart from byte 0
+        elif resp.status in TRANSIENT_STATUSES:
+            raise TransientStatusError(f"{url}: HTTP status {resp.status} (server busy, worth retrying)")
         else:
             raise DownloadError(f"{url}: unexpected HTTP status {resp.status}")
         with open(part, mode) as f:
@@ -222,12 +326,17 @@ def fetch_source(
     transport: Transport,
     state: FetchState,
     lister: Callable[[str], Iterable[tuple[str, int]]] | None = None,
+    *,
+    max_retries: int = 8,
+    sleep: Callable[[float], None] = time.sleep,
 ) -> list[DownloadResult]:
     """DATA-12. Download a manifest source into ``raw_root/source.id`` and record hashes; stream sources -> ValueError.
 
     Multi-file sources: ``lister(prefix_url)`` yields ``(file_url, size)`` for every remote file under one expanded
-    prefix (S3: ``s3://bucket/key``; see ``s3_lister`` / ``zenodo_lister``). Files already present with the right
-    size are never downloaded again (they are only hashed into the state if the state has no record of them).
+    prefix (S3: ``s3://bucket/key``; see ``s3_lister`` / ``zenodo_lister`` / ``http_index_lister``). Files already
+    present with the right size are never downloaded again (they are only hashed into the state if the state has no
+    record of them). Every file download retries dropped connections (HTTP and S3) and busy-server statuses
+    (``max_retries``, see ``download``).
     """
     if source.target == "stream":
         raise ValueError(f"source {source.id!r} is streamed (target 'stream'); it is never stored raw")
@@ -239,7 +348,13 @@ def fetch_source(
         name = _url_basename(source.url)
         size = _remote_size(transport, source.url)
         result = download(
-            source.url, folder / name, transport, expected_sha256=source.sha256, expected_size=size
+            source.url,
+            folder / name,
+            transport,
+            expected_sha256=source.sha256,
+            expected_size=size,
+            max_retries=max_retries,
+            sleep=sleep,
         )
         _record(state, source.id, name, result)
         return [result]
@@ -259,7 +374,7 @@ def fetch_source(
                 if state.get(source.id, rel) is None:
                     state.record(source.id, rel, sha256_file(dest), dest.stat().st_size)
                 continue
-            result = download(key, dest, transport, expected_size=size)
+            result = download(key, dest, transport, expected_size=size, max_retries=max_retries, sleep=sleep)
             _record(state, source.id, rel, result)
             results.append(result)
     return results
@@ -432,19 +547,131 @@ def zenodo_lister(prefix_url: str) -> Iterator[tuple[str, int]]:
         yield base + f["key"], int(f["size"])
 
 
+class _LinkParser(HTMLParser):
+    """Collects the ``href`` of every ``<a>`` tag of an HTML page, in page order."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.hrefs: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "a":
+            for name, value in attrs:
+                if name == "href" and value:
+                    self.hrefs.append(value)
+
+
+def parse_index_links(html: str, page_url: str) -> list[str]:
+    """Absolute URLs of all ``<a href>`` links in ``html``, resolved against ``page_url``; duplicates dropped."""
+    parser = _LinkParser()
+    parser.feed(html)
+    parser.close()
+    out: list[str] = []
+    for href in parser.hrefs:
+        url = urljoin(page_url, href).split("#", 1)[0]
+        if url not in out:
+            out.append(url)
+    return out
+
+
+def _http_get_text(url: str) -> str:
+    import requests
+
+    r = requests.get(url, timeout=_TIMEOUT, headers={"User-Agent": "outrun-fetch/0.1"})
+    r.raise_for_status()
+    return r.text
+
+
+def _http_head_size(url: str) -> int | None:
+    import requests
+
+    r = requests.head(url, allow_redirects=True, timeout=_TIMEOUT, headers={"User-Agent": "outrun-fetch/0.1"})
+    length = r.headers.get("Content-Length")
+    return int(length) if r.ok and length else None
+
+
+def http_index_lister(
+    prefix_url: str,
+    patterns: Sequence[str] = ("*",),
+    *,
+    index_page: str = "",
+    get_text: Callable[[str], str] = _http_get_text,
+    head_size: Callable[[str], int | None] = _http_head_size,
+) -> Iterator[tuple[str, int]]:
+    """Files linked from a plain HTML index page (Apache ``Index of /...``) as ``(file url, size)``.
+
+    1. Fetch ``prefix_url + index_page`` (``index_page`` is '' for a real directory index, or a page such as
+       ``download_files.html`` when the server forbids directory listings) and collect its ``<a href>`` links.
+    2. Keep only files directly under ``prefix_url`` (so no sort links ``?C=N;O=D``, parent or sub-directories)
+       whose file name matches one of the shell-style ``patterns`` (case-sensitive ``fnmatchcase``).
+    3. Ask the server for each kept file's exact size with a HEAD request: the "29M" on the page is rounded, and
+       ``fetch_source`` needs exact sizes to skip finished files and to check downloads.
+    Nothing matching, or a file without a Content-Length, raises ``DownloadError`` (never a silent empty fetch).
+    """
+    if not prefix_url.endswith("/"):
+        raise ValueError(f"an index prefix must end with '/', got {prefix_url!r}")
+    page_url = prefix_url + index_page
+    found = 0
+    for url in parse_index_links(get_text(page_url), page_url):
+        if not url.startswith(prefix_url) or urlsplit(url).query:
+            continue
+        name = url[len(prefix_url) :]
+        if not name or "/" in name:  # the directory itself, or something below a sub-directory
+            continue
+        if not any(fnmatch.fnmatchcase(name, p) for p in patterns):
+            continue
+        size = head_size(url)
+        if size is None:
+            raise DownloadError(f"{url}: server gave no Content-Length, cannot plan the download")
+        found += 1
+        yield url, int(size)
+    if found == 0:
+        raise DownloadError(f"{page_url}: no linked file matches {list(patterns)}")
+
+
+# File-name globs for http directory sources, keyed by source id. The manifest has no field for this (see NOTES),
+# and an unfiltered directory would pull far too much (Storm Events also has fatalities/locations files back to
+# 1950). A directory source that is not listed here is refused by default_lister.
+HTTP_INDEX_RULES: dict[str, dict] = {
+    "storm_events": {
+        "patterns": (
+            "StormEvents_details-ftp_v1.0_d2019_c*.csv.gz",
+            "StormEvents_details-ftp_v1.0_d202[0-6]_c*.csv.gz",
+        ),
+    },
+    "aqs_pm25_hourly": {
+        # aqs.epa.gov/aqsweb/airdata/ answers 403 to a directory listing (checked Nov 18); its file links live on
+        # download_files.html, relative to the same folder.
+        "index_page": "download_files.html",
+        "patterns": ("hourly_88101_202[2-5].zip",),
+    },
+}
+
+
 def default_transport(source: Source) -> Transport:
     """S3Transport for ``s3://`` URLs, HttpTransport otherwise."""
     return S3Transport() if source.url.startswith("s3://") else HttpTransport()
 
 
 def default_lister(source: Source) -> Callable[[str], Iterable[tuple[str, int]]] | None:
-    """s3_lister / zenodo_lister by URL, None for single-file sources."""
+    """s3_lister / zenodo_lister / http_index_lister by URL, None for single-file sources.
+
+    An http(s) URL ending in '/' uses ``http_index_lister`` with the source's rule in ``HTTP_INDEX_RULES``; a
+    directory source without a rule raises ValueError rather than download the whole directory.
+    """
     if source.is_single_file:
         return None
     if source.url.startswith("s3://"):
         return s3_lister
     if source.url.startswith("https://zenodo.org/records/"):
         return zenodo_lister
+    if (
+        source.url.startswith(("http://", "https://"))
+        and source.url.endswith("/")
+        and source.id in HTTP_INDEX_RULES
+    ):
+        rule = HTTP_INDEX_RULES[source.id]
+        return partial(http_index_lister, patterns=rule["patterns"], index_page=rule.get("index_page", ""))
     raise ValueError(f"source {source.id!r}: no lister for {source.url!r}")
 
 

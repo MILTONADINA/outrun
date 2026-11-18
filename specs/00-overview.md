@@ -18,7 +18,7 @@ Only depth may shrink (DESIGN 7.1); nothing in the proposal is optional.
 ## Architecture
 
 ```
-                  RAW (external HDD /Volumes/OutrunRaw)              STREAMED (never stored raw)
+                  RAW ($OUTRUN_RAW, internal SSD)                     STREAMED (never stored raw)
  SEVIR VIL+IR107 h5 | TorNet nc | NDWS tfrecord | WSTS tif | MRMS QPE+FLASH grib2 | HRRR byte-range grib2
  AQS csv | HMS shp | Storm Events/SPC csv | ETOPO/3DEP tif | OSM pbf | HIFLD parquet | Census
         |                                                                         |
@@ -95,7 +95,7 @@ plans on a forecast and scores on observed data. Overlay PNGs and edge costs com
 - Units: metres, seconds for clock time internally (minutes only at the UI/report boundary), probabilities in
   [0, 1], times are timezone-aware UTC `datetime`.
 - Config values come from `configs/*.yaml` (loaded by `outrun.config`), never hard-coded duplicates.
-- Data paths: RAW on the external HDD (`OUTRUN_RAW`, default `/Volumes/OutrunRaw`), PROC on the SSD (`OUTRUN_PROC`).
+- Data paths: RAW and PROC both on the internal SSD (`OUTRUN_RAW`, `OUTRUN_PROC`; code default `/Volumes/OutrunRaw` only if unset).
 
 ### Held-out discipline
 - Splits frozen in T7 (`splits/*.json`, `quarantine.json`, `hashes.json`) before any training.

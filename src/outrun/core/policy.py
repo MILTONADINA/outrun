@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
@@ -51,17 +51,36 @@ def make_speed_factor(slope: float) -> Callable[[Any], Any]:
 
     RISK-09.
     """
-    raise NotImplementedError
+    if slope < 0:
+        raise ValueError(f"speed_factor slope must be >= 0, got {slope}")
+
+    def speed_factor(p: Any) -> Any:
+        out = np.clip(1.0 - slope * np.asarray(p, dtype=np.float64), 1.0 / 3.0, 1.0)
+        return float(out) if out.ndim == 0 else out
+
+    return speed_factor
 
 
 def blocks(policy: HazardPolicy, profile: Profile, p: Any) -> bool | np.ndarray:
     """False everywhere if ``policy.block_at[profile] is None``, else ``p >= block_at`` (RISK-09)."""
-    raise NotImplementedError
+    threshold = policy.block_at.get(profile)
+    p_arr = np.asarray(p)
+    result = np.zeros(p_arr.shape, dtype=bool) if threshold is None else p_arr >= threshold
+    return bool(result) if result.ndim == 0 else result
 
 
 def load_hazard_config(path: str | Path | None = None) -> dict[str, Any]:
     """Parsed ``hazards.yaml`` from ``outrun.config.get_paths().configs`` (env ``OUTRUN_CONFIG_DIR``) (RISK-09)."""
-    raise NotImplementedError
+    from outrun.config import load_config
+
+    if path is None:
+        return load_config("hazards")
+    import yaml
+
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: top level must be a mapping, got {type(data).__name__}")
+    return data
 
 
 def load_policies(path: str | Path | None = None) -> dict[Hazard, HazardPolicy]:
@@ -69,7 +88,41 @@ def load_policies(path: str | Path | None = None) -> dict[Hazard, HazardPolicy]:
 
     A missing hazard or an invalid ``beyond_horizon`` raises ValueError.
     """
-    raise NotImplementedError
+    from outrun.core.risk import Hazard
+
+    cfg = load_hazard_config(path).get("hazards") or {}
+    policies: dict[Hazard, HazardPolicy] = {}
+    for hazard in Hazard:
+        if hazard.value not in cfg:
+            raise ValueError(f"hazards.yaml has no entry for {hazard.value!r}")
+        h = cfg[hazard.value]
+        try:
+            block_at = {
+                prof: (None if h["block_at"][prof.value] is None else float(h["block_at"][prof.value]))
+                for prof in Profile
+            }
+            weights = {prof: float(h["exposure_weight"][prof.value]) for prof in Profile}
+            slope = float(h["speed_factor_slope"])
+            rule = h["beyond_horizon"]
+        except KeyError as exc:
+            raise ValueError(f"hazards.yaml entry {hazard.value!r} is missing {exc}") from exc
+        if rule not in BEYOND_HORIZON_RULES:
+            raise ValueError(
+                f"{hazard.value}: beyond_horizon must be one of {BEYOND_HORIZON_RULES}, got {rule!r}"
+            )
+        tau = h.get("decay_tau_min")
+        policies[hazard] = HazardPolicy(
+            block_at=block_at,
+            speed_factor=make_speed_factor(slope),
+            exposure_weight=weights,
+            beyond_horizon=rule,
+            decay_tau_min=None if tau is None else float(tau),
+        )
+    return policies
+
+
+def _is_aware(t: Any) -> bool:
+    return isinstance(t, datetime) and t.tzinfo is not None and t.utcoffset() is not None
 
 
 def apply_beyond_horizon(
@@ -97,4 +150,43 @@ def apply_beyond_horizon(
     Returns a new float32 array ``(n_slots, *prob.shape[1:])``; the input is not modified (HORIZON-04).
     Raises ValueError for no valid slot, naive datetimes, an unknown rule, or decay without a positive tau.
     """
-    raise NotImplementedError
+    if not (_is_aware(t0) and _is_aware(issued) and _is_aware(valid_until)):
+        raise ValueError("t0, issued and valid_until must be timezone-aware datetimes")
+    rule = policy.beyond_horizon
+    if rule not in BEYOND_HORIZON_RULES:
+        raise ValueError(f"unknown beyond_horizon rule {rule!r}")
+    tau = policy.decay_tau_min
+    if rule == "decay" and (tau is None or tau <= 0):
+        raise ValueError(f"decay needs decay_tau_min > 0, got {tau!r}")
+
+    prob = np.asarray(prob)
+    slot_starts = [t0 + timedelta(minutes=k * slot_minutes) for k in range(n_slots)]
+
+    # Valid slots: the layer has data for them and they start before the horizon ends (always a prefix).
+    n_valid = 0
+    while n_valid < min(n_slots, prob.shape[0]) and slot_starts[n_valid] < valid_until:
+        n_valid += 1
+    if n_valid == 0:
+        raise ValueError("the layer has no valid slot in the routing window (horizon ends at or before t0)")
+
+    out = np.zeros((n_slots, *prob.shape[1:]), dtype=np.float32)  # new array: the input is never modified
+    out[:n_valid] = prob[:n_valid]
+    last = out[n_valid - 1].copy()  # L, the last valid slot
+
+    if rule == "drop":
+        thresholds = [b for b in policy.block_at.values() if b is not None]
+        lingering = last >= min(thresholds) if thresholds else np.zeros(last.shape, dtype=bool)
+
+    for k in range(n_valid, n_slots):
+        dt_min = max(0.0, (slot_starts[k] - valid_until).total_seconds() / 60.0)
+        if rule == "hold":
+            out[k] = last
+        elif rule == "decay":
+            since_issue_min = (slot_starts[k] - issued).total_seconds() / 60.0
+            if zero_after_min is not None and since_issue_min >= zero_after_min:
+                out[k] = 0.0
+            else:
+                out[k] = last * np.exp(-dt_min / tau)
+        else:  # drop: zero, except blocked cells that linger for linger_min after the horizon
+            out[k] = np.where(lingering, last, 0.0) if dt_min < linger_min else 0.0
+    return np.clip(out, 0.0, 1.0, out=out)

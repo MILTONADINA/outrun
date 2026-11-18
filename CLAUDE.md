@@ -56,12 +56,13 @@ emergency-vehicle dispatch plan on real OSM roads. A FastAPI + MapLibre app show
 - `cfgrib` needs eccodes (`brew install eccodes`); pygrib is the documented fallback.
 
 ## Data and disks
-- **RAW** downloads live on the external HDD, default `/Volumes/OutrunRaw`, configurable with `OUTRUN_RAW`
-  (see `outrun.config`). Raw files are read once and never modified.
-- **PROC** (processed memmaps, zarr, parquet, graphs, scenarios) lives on the internal SSD, default `data/proc`,
-  configurable with `OUTRUN_PROC`.
+- **RAW** downloads live at `OUTRUN_RAW`; on this machine that is `/Users/milto/OutrunData/raw` on the internal SSD
+  (there is no external HDD). The code default `/Volumes/OutrunRaw` is used only if `OUTRUN_RAW` is unset (see
+  `outrun.config`). Raw files are read once and never modified.
+- **PROC** (processed memmaps, zarr, parquet, graphs, scenarios) lives at `OUTRUN_PROC`; on this machine
+  `/Users/milto/OutrunData/proc` (code default `data/proc`).
 - `data/manifest.yaml` lists every source with URL, approximate bytes, sha256, licence and target disk.
-- Disk budget (DESIGN 7.3): HDD at most 375 GB, SSD at most 225 GB. Run `outrun disk` before every big job.
+- Disk budget (`configs/disk.yaml`, lowered from DESIGN 7.3): RAW ("hdd") at most 300 GB, PROC ("ssd") at most 150 GB. Run `outrun disk` before every big job.
 - Tests never touch real data or the network: synthetic fixtures only (tiny graphs, 32x32 grids, fake arrays).
 
 ## Long-running commands

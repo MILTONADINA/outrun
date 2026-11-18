@@ -22,7 +22,7 @@ Written Tue Nov 17 2026. Due Fri Dec 4 2026, 1:40 pm (17 days).
 ### 1.1 Diagram
 
 ```
-                  RAW (external HDD /Volumes/OutrunRaw)              STREAMED (never stored raw)
+                  RAW ($OUTRUN_RAW, internal SSD)                    STREAMED (never stored raw)
  SEVIR VIL+IR107 h5 | TorNet nc | NDWS tfrecord | WSTS tif | MRMS QPE+FLASH grib2 | HRRR byte-range grib2
  AQS csv | HMS shp | Storm Events/SPC csv | ETOPO/3DEP tif | OSM pbf | HIFLD parquet | Census
         |                                                                         |
@@ -761,7 +761,9 @@ No single event is covered by all six datasets: SEVIR covers 2017-2019, MRMS on 
 
 Not pursued: Oklahoma Mesonet road and soil temperatures (academic agreement turnaround could exceed 17 days). The report names it as the top ice improvement.
 
-### 7.3 Disk budget (margin rule: HDD at most 375 of 500 GB, SSD at most 225 of the 300 GB budget)
+### 7.3 Disk budget (caps in `configs/disk.yaml`: RAW "hdd" at most 300 GB, PROC "ssd" at most 150 GB)
+
+Storage decision (Nov 17): there is no external HDD. RAW (`OUTRUN_RAW=/Users/milto/OutrunData/raw`) and PROC (`OUTRUN_PROC=/Users/milto/OutrunData/proc`) both live on the internal SSD; the code default `/Volumes/OutrunRaw` applies only when `OUTRUN_RAW` is unset. The original caps (375 GB HDD, 225 GB SSD) were lowered to keep a margin on the one shared disk. The column names below keep the "HDD"/"SSD" labels for RAW/PROC.
 
 | Item | HDD raw (GB) | SSD processed (GB) |
 |---|---|---|
@@ -778,9 +780,11 @@ Not pursued: Oklahoma Mesonet road and soil temperatures (academic agreement tur
 | OSM PBF, HIFLD, census, graphs, PMTiles | 1 | 3 |
 | Models, scenarios, logs, figures | - | 12 |
 | venv and caches | - | 6 |
-| **Total (worst case)** | **≈ 264 (53%)** | **≈ 165 peak (55% of budget)** |
+| **Total (worst case)** | **≈ 264 (88% of the 300 GB cap)** | **≈ 165 peak (110% of the 150 GB cap: over, see below)** |
 
-If T1 measurements push the HDD over 375 GB, cut in this order: IR107 2018 H1 files, then WSTS (re-download only the 2021 portion if the record allows it), then TorNet 2016. `outrun disk` checks free space before every job.
+If T1 measurements push RAW over its 300 GB cap, cut in this order: IR107 2018 H1 files, then WSTS (re-download only the 2021 portion if the record allows it), then TorNet 2016. `outrun disk` checks free space before every job.
+
+The worst-case PROC peak (≈ 165 GB) is over the lowered 150 GB cap. Without the 19 GB transient TorNet extraction it is ≈ 146 GB, so the plan is: extract and process TorNet half a year at a time and delete each part before the next (transient ≤ 10 GB), and keep the venv and caches (6 GB) out of `OUTRUN_PROC`. If T1/T2 measurements still push PROC over 150 GB, Milton decides between raising `ssd_cap_gb` (the shared SSD has room only if RAW stays well under its cap) and cutting processed data (IR107 2 km patches first).
 
 ---
 
