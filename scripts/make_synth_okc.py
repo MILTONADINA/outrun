@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -125,6 +126,19 @@ def main() -> int:
         "slot_minutes": 15,
     }
     (folder / "scenario.json").write_text(json.dumps(meta, indent=2))
+
+    # Live /api/route inputs (DefaultBackend._load): graph.npz + risk.zarr. Both are local-only (.gitignore).
+    graph_link = folder / "graph.npz"
+    if graph_link.is_symlink() or graph_link.exists():
+        graph_link.unlink()
+    try:
+        graph_link.symlink_to(Path(args.graph).resolve())
+    except OSError:
+        shutil.copy2(args.graph, graph_link)
+    zarr_path = folder / "risk.zarr"
+    if zarr_path.exists():
+        shutil.rmtree(zarr_path)
+    stack.to_zarr(zarr_path)
     print(f"wrote {folder}")
     for name, s in (("shortest", s_short), ("risk-aware", s_safe)):
         print(f"{name:10s} {s['travel_min']:.1f} min  {s['km']:.1f} km  exposure {s['exposure']:.1f}")

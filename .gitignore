@@ -24,3 +24,4 @@ htmlcov/
 .vscode/
 .claude/settings.local.json
 cache/
+scenarios/**/graph.npz
