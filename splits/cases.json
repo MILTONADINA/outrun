@@ -1,0 +1,11 @@
+{
+  "_comment": "T7 case-study registry (SPLIT-11, DESIGN 6.4). Verified in T7, see NOTES.md. Only held_out=quarantine cases feed quarantine.json.",
+  "cases": [
+    {"id": "primary_ok_20190520", "hazards": ["storm", "tornado"], "day": "2019-05-20", "city": "okc", "held_out": "quarantine", "primary": true},
+    {"id": "el_reno_20190526", "hazards": ["storm", "tornado"], "day": "2019-05-26", "city": "okc", "held_out": "quarantine"},
+    {"id": "sevir_S837313_20190616", "hazards": ["storm", "tornado"], "day": "2019-06-16", "city": "okc", "held_out": "official_test"},
+    {"id": "flood_ep203955_20250712", "hazards": ["flood"], "day": "2025-07-12", "city": "okc", "held_out": "official_test"},
+    {"id": "ice_ep200487_20250218", "hazards": ["ice"], "day": "2025-02-18", "city": "okc", "held_out": "official_test"},
+    {"id": "smoke_20240405", "hazards": ["smoke"], "day": "2024-04-05", "city": "okc", "held_out": "official_test"}
+  ]
+}

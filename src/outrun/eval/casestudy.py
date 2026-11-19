@@ -31,4 +31,10 @@ class CaseStudy:
 def case_quarantine(cases: Iterable[CaseStudy]) -> dict[str, date]:
     """SPLIT-11. ``{case id: day}`` for the quarantine cases only; ``ValueError`` on duplicate ids or on more
     than one primary case."""
-    raise NotImplementedError
+    cases = list(cases)
+    ids = [c.id for c in cases]
+    if len(set(ids)) != len(ids):
+        raise ValueError("duplicate case-study ids")
+    if sum(1 for c in cases if c.primary) > 1:
+        raise ValueError("more than one primary case study")
+    return {c.id: c.day for c in cases if c.held_out == "quarantine"}

@@ -62,7 +62,13 @@ def bags_for_split(bags: pd.DataFrame, split: Split, part: str) -> pd.DataFrame:
 
     Uses ``eval.splits.split_mask``; input order kept, index reset.
     """
-    raise NotImplementedError
+    from outrun.eval.splits import split_mask
+
+    ids = [
+        f"{z}|{pd.Timestamp(t).isoformat()}"
+        for z, t in zip(bags["zone_id"], bags["window_start"], strict=True)
+    ]
+    return bags[split_mask(ids, split, part)].reset_index(drop=True)
 
 
 def check_lead(lead_h: int) -> None:

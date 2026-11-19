@@ -1,0 +1,24 @@
+{
+  "cases": {
+    "file_sha256": "d78dd76375ed0ecdf9f3abb7461c4bb96bac7277e6455693cae5364504e46656"
+  },
+  "ndws": {
+    "file_sha256": "b9dd549a35a45bf42bb8a68934f2fa96148b7e152ad7818063e9a901c0657a07",
+    "test_ids_sha256": "eda961d032bee87a942bceb28d8d14e1a9b648ddfb6670145b9702670a61ea0a"
+  },
+  "quarantine": {
+    "file_sha256": "4c990e79e9afa9e22ca356867bb6953fed1d618aa3a9889d556a725e217c0eb3"
+  },
+  "sevir": {
+    "file_sha256": "0904c8f7415f024ca6dd0a7d73c59c4ff714c4ab60fa0e41d2ca43a05c12299f",
+    "test_ids_sha256": "e73c4d6035664c1b636fa958d2d4071f79b815d4c13c6d658b63de98d10552c7"
+  },
+  "tornet": {
+    "file_sha256": "aed2054c8833c24cf6826732327b582b35a895fbaa1edace07e4a75ce4b7dd56",
+    "test_ids_sha256": "9e3e4da0fafd2ac5899b45e218d90979a43a36ab3c6f4a0c7bd1043331d4e26b"
+  },
+  "wsts": {
+    "file_sha256": "aec90a58b6311be1c7282c40acd710c41878f265bb2b08aba49099d4b7f58411",
+    "test_ids_sha256": "516e903718831d20f4d4e1a263c4922f517d687192e4ad357b4205bdca828cf0"
+  }
+}

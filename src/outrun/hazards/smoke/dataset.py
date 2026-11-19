@@ -42,7 +42,13 @@ def samples_for_split(samples: pd.DataFrame, split: Split, part: str) -> pd.Data
 
     Uses ``eval.splits.split_mask``; input order kept, index reset.
     """
-    raise NotImplementedError
+    from outrun.eval.splits import split_mask
+
+    ids = [
+        f"{z}|{pd.Timestamp(t).isoformat()}"
+        for z, t in zip(samples["site_id"], samples["issue_time"], strict=True)
+    ]
+    return samples[split_mask(ids, split, part)].reset_index(drop=True)
 
 
 def rasterize_hms(polygons: Sequence[tuple[object, str]], x: np.ndarray, y: np.ndarray) -> np.ndarray:
