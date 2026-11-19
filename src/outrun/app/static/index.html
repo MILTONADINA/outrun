@@ -4,26 +4,113 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Outrun</title>
-  <!-- Placeholder page (T0). Vendored MapLibre GL JS 4 + pmtiles.js go in static/vendor/ (T6). -->
+  <!-- All libraries are vendored under static/vendor/ (never a CDN) so the app works offline. -->
+  <link rel="stylesheet" href="static/vendor/maplibre-gl.css">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
   <header>
     <h1>Outrun</h1>
-    <input id="city-box" type="search" placeholder="Any US city">
+    <select id="scenario-select" title="Scenario"></select>
+    <input id="city-box" type="search" placeholder="Any US city (press Enter)">
     <nav>
-      <button data-tab="forecast">Forecast</button>
+      <button data-tab="forecast" class="active">Forecast</button>
       <button data-tab="route">Safe route</button>
       <button data-tab="shelters">Shelters</button>
-      <button data-tab="evac">City evacuation</button>
+      <button data-tab="evac">Evacuation</button>
       <button data-tab="dispatch">Dispatch</button>
-      <button data-tab="results">Models and results</button>
+      <button data-tab="results">Metrics</button>
     </nav>
   </header>
+
   <main>
+    <aside id="panel">
+      <p id="status" class="status"></p>
+
+      <!-- One section per tab; app.js shows the one that matches the active tab. -->
+      <section data-panel="forecast">
+        <h2>Hazard forecast</h2>
+        <label>Hazard <select id="hazard-select"></select></label>
+        <label>Source <select id="source-select"></select></label>
+        <label>Time slot <span id="slot-label"></span>
+          <input id="slot-slider" type="range" min="0" max="11" value="0">
+        </label>
+        <p class="hint">Colored overlay = predicted risk for the chosen hazard and time.</p>
+      </section>
+
+      <section data-panel="route" hidden>
+        <h2>Safe route</h2>
+        <label>Destination
+          <select id="dest-mode">
+            <option value="nearest_shelter">Nearest shelter</option>
+            <option value="click">Click on map</option>
+          </select>
+        </label>
+        <label>Profile
+          <select id="profile-select">
+            <option value="civilian">Civilian</option>
+            <option value="sensitive">Sensitive</option>
+            <option value="ev">Electric vehicle</option>
+          </select>
+        </label>
+        <p class="hint" id="route-hint">Click the map to set the origin.</p>
+        <table id="route-table" hidden>
+          <thead><tr><th></th><th class="c-outrun">Risk-aware</th><th class="c-short">Shortest</th></tr></thead>
+          <tbody>
+            <tr><td>Time (min)</td><td id="rt-time-o"></td><td id="rt-time-s"></td></tr>
+            <tr><td>Distance (km)</td><td id="rt-dist-o"></td><td id="rt-dist-s"></td></tr>
+            <tr><td>Risk exposure</td><td id="rt-risk-o"></td><td id="rt-risk-s"></td></tr>
+          </tbody>
+        </table>
+        <p id="route-note" class="hint"></p>
+      </section>
+
+      <section data-panel="shelters" hidden>
+        <h2>Shelter assignment</h2>
+        <label>Method
+          <select id="shelter-method">
+            <option value="mcf">Min-cost flow</option>
+            <option value="nearest">Nearest</option>
+            <option value="greedy">Greedy</option>
+          </select>
+        </label>
+        <pre id="shelter-metrics" class="box"></pre>
+      </section>
+
+      <section data-panel="evac" hidden>
+        <h2>City evacuation</h2>
+        <label>Method
+          <select id="evac-method">
+            <option value="sa">Simulated annealing</option>
+            <option value="msa">MSA</option>
+            <option value="shortest">Shortest</option>
+            <option value="safest">Safest</option>
+          </select>
+        </label>
+        <button id="evac-run">Run live annealing</button>
+        <p id="evac-progress" class="hint"></p>
+        <pre id="evac-metrics" class="box"></pre>
+      </section>
+
+      <section data-panel="dispatch" hidden>
+        <h2>Emergency dispatch</h2>
+        <p class="hint">Click the map to add 1 to 3 incidents.</p>
+        <button id="dispatch-go">Dispatch units</button>
+        <button id="dispatch-clear">Clear</button>
+        <pre id="dispatch-out" class="box"></pre>
+      </section>
+
+      <section data-panel="results" hidden>
+        <h2>Model and routing metrics</h2>
+        <pre id="metrics-out" class="box"></pre>
+      </section>
+    </aside>
+
     <div id="map"></div>
-    <aside id="panel"></aside>
   </main>
+
+  <script src="static/vendor/maplibre-gl.js"></script>
+  <script src="static/vendor/pmtiles.js"></script>
   <script src="static/app.js"></script>
 </body>
 </html>

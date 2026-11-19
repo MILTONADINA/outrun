@@ -158,3 +158,35 @@ def synthetic_stack(t0: datetime | None = None, n: int = 32) -> RiskStack:
     adapters = [SyntheticAdapter(h) for h in Hazard]
     policies = {ad.hazard: ad.policy for ad in adapters}
     return build_stack(adapters, synthetic_scenario(t0, n), RiskSource.MODEL, policies=policies)
+
+
+def crossing_storm(
+    n_slots: int,
+    shape: tuple[int, int],
+    centre: tuple[float, float],
+    travel: tuple[float, float],
+    *,
+    hit_slot: int = 2,
+    cells_per_slot: float = 3.0,
+    sigma: float = 5.0,
+    peak: float = 0.9,
+) -> np.ndarray:
+    """Moving storm cube that sweeps across the line a trip follows.
+
+    ``centre`` is the (row, col) midpoint of the trip and ``travel`` the (row, col) direction of the trip. The cell
+    moves at ``cells_per_slot`` perpendicular to ``travel`` and sits on ``centre`` at slot ``hit_slot``. Wide
+    (``sigma`` cells) so a risk-aware route has to detour or wait; used by the demo bundle and ``--demo-storm``.
+    """
+    d = np.hypot(*travel)
+    if d == 0:
+        raise ValueError("travel direction must be non-zero")
+    perp = (-travel[1] / d, travel[0] / d)  # rotate 90 degrees
+    start = (centre[0] - perp[0] * cells_per_slot * hit_slot, centre[1] - perp[1] * cells_per_slot * hit_slot)
+    return moving_gaussian(
+        n_slots,
+        shape,
+        start=start,
+        velocity=(perp[0] * cells_per_slot, perp[1] * cells_per_slot),
+        sigma=sigma,
+        peak=peak,
+    )

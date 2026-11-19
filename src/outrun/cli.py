@@ -331,12 +331,12 @@ def _shelter_nodes(graph, shelters: str | None) -> list[int]:
 def _route_risk_stack(graph, args: argparse.Namespace, goal: int, origin: int):
     """RiskStack on a window around the graph.
 
-    ``none`` -> all zeros. ``--demo-storm`` -> one synthetic storm cell sitting halfway between origin and goal
+    ``none`` -> all zeros. ``--demo-storm`` -> one synthetic moving storm cell sweeping across the origin-goal line
     (useful before any model is trained). Otherwise the hazard adapters build the stack (RISK-08).
     """
     from outrun.core.grid import bbox_to_window, lonlat_to_xy
     from outrun.core.risk import RiskSource, RiskStack, build_stack
-    from outrun.core.synthetic import moving_gaussian
+    from outrun.core.synthetic import crossing_storm
 
     graph_bbox = (
         float(graph.lon.min()),
@@ -348,16 +348,19 @@ def _route_risk_stack(graph, args: argparse.Namespace, goal: int, origin: int):
     t0 = datetime.now(UTC).replace(second=0, microsecond=0)
 
     if args.demo_storm:
-        mid_lon = (graph.lon[origin] + graph.lon[goal]) / 2
-        mid_lat = (graph.lat[origin] + graph.lat[goal]) / 2
-        mx, my = lonlat_to_xy(mid_lon, mid_lat)
-        row = float(
-            (np.asarray(my) - window.y_centers()[0]) / (window.y_centers()[1] - window.y_centers()[0])
+        dy_m = window.y_centers()[1] - window.y_centers()[0]
+        dx_m = window.x_centers()[1] - window.x_centers()[0]
+        (r0, c0), (r1, c1) = (
+            (
+                float((np.asarray(y) - window.y_centers()[0]) / dy_m),
+                float((np.asarray(x) - window.x_centers()[0]) / dx_m),
+            )
+            for x, y in (lonlat_to_xy(graph.lon[n], graph.lat[n]) for n in (origin, goal))
         )
-        col = float(
-            (np.asarray(mx) - window.x_centers()[0]) / (window.x_centers()[1] - window.x_centers()[0])
+        # a moving storm sweeping across the trip (same generator as scenarios/synth-okc)
+        storm = crossing_storm(
+            12, window.shape, ((r0 + r1) / 2, (c0 + c1) / 2), (r1 - r0, c1 - c0), hit_slot=1
         )
-        storm = moving_gaussian(12, window.shape, start=(row, col), velocity=(0.0, 0.0), sigma=2.0, peak=0.9)
         data = RiskStack.zeros(t0, window).data.copy()
         data[list(Hazard).index(Hazard.STORM)] = storm
         return RiskStack(data, t0, window)

@@ -301,6 +301,16 @@ class CostModel:
         return self._block_at.copy()
 
     @property
+    def risk(self) -> np.ndarray:
+        """The (E, H, S) edge risk this model was built with (read-only view)."""
+        return self._risk
+
+    @property
+    def lam(self) -> float:
+        """Risk-aversion weight lambda."""
+        return self._lam
+
+    @property
     def node_risk(self) -> np.ndarray | None:
         """(N, H, S) node risk or None."""
         return self._node_risk

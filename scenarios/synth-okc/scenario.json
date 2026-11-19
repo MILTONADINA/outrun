@@ -1,0 +1,23 @@
+{
+  "id": "synth-okc",
+  "title": "Synthetic moving storm, Oklahoma City",
+  "t0": "2019-05-26T03:00:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "storm"
+  ],
+  "held_out": false,
+  "synthetic": true,
+  "sources": [
+    "synthetic moving Gaussian storm",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15
+}

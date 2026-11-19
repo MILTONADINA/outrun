@@ -216,11 +216,69 @@ def score_route(
     Plan on forecast, score on observed: callers pass the observed arrays here; passing a forecast array gives
     the "predicted exposure". The last slot extends to infinity (hold).
     """
-    raise NotImplementedError
+    n = len(trace.edges)
+    if not (len(trace.t_enter_s) == n and len(trace.t_exit_s) == n):
+        raise ValueError("edges, t_enter_s and t_exit_s must have the same length")
+    if trace.wait_nodes is not None and len(trace.wait_nodes) != n:
+        raise ValueError("wait_nodes must have one entry per edge")
+    edge_risk = np.asarray(edge_risk, dtype=np.float64)
+    n_edges, n_slots = edge_risk.shape
+    use_node_risk = node_risk is not None and trace.wait_nodes is not None
+
+    def slot_overlaps(start: float, end: float) -> list[tuple[int, float]]:
+        """(slot, seconds of [start, end) inside that slot); the last slot extends to infinity."""
+        first = min(int(start // slot_s), n_slots - 1)
+        last = min(int(end // slot_s), n_slots - 1)
+        out = []
+        for k in range(first, last + 1):
+            lo = start if k == first else k * slot_s
+            hi = end if k == last else (k + 1) * slot_s
+            out.append((k, hi - lo))
+        return out
+
+    exposure_s = 0.0  # risk-seconds
+    intersects = False
+    blocked_crossings = 0
+    occupancy_start = trace.t_start_s
+    for i, e in enumerate(trace.edges):
+        t_enter, t_exit = trace.t_enter_s[i], trace.t_exit_s[i]
+        if not 0 <= e < n_edges:
+            raise ValueError(f"edge {e} is outside edge_risk")
+        if t_enter < occupancy_start or t_exit < t_enter:
+            raise ValueError(f"edge {e}: times must satisfy {occupancy_start} <= enter <= exit")
+        # wait at the tail node
+        if use_node_risk:
+            node = trace.wait_nodes[i]
+            if not 0 <= node < node_risk.shape[0]:
+                raise ValueError(f"wait node {node} is outside node_risk")
+        for k, seconds in slot_overlaps(occupancy_start, t_enter):
+            exposure_s += seconds * (node_risk[node, k] if use_node_risk else edge_risk[e, k])
+        # traversal (a zero-length traversal touches only the slot containing t_enter)
+        touched = slot_overlaps(t_enter, t_exit)
+        crossing_blocked = False
+        for k, seconds in touched:
+            exposure_s += seconds * edge_risk[e, k]
+            blocked = edge_blocked is not None and bool(edge_blocked[e, k])
+            if edge_risk[e, k] >= threshold or blocked:
+                intersects = True
+            crossing_blocked = crossing_blocked or blocked
+        if e in crossing_edges and crossing_blocked:
+            blocked_crossings += 1
+        occupancy_start = t_exit
+    return RouteScore(intersects, exposure_s / 60.0, trace.travel_time_s, blocked_crossings)
 
 
 def route_trace(route: Any, t0_s: float = 0.0) -> RouteTrace:
     """EVAL-09. Convert a router ``Route`` (spec 04; duck-typed: ``nodes``, ``edges``, ``depart_s``, ``waits_s``,
     ``start_s``, ``arrive_s``) to a ``RouteTrace`` with times measured from ``t0_s`` (default: scenario clock),
     ``t_start_s = start_s - t0_s`` and ``wait_nodes = nodes[:-1]``."""
-    raise NotImplementedError
+    enter = [d - t0_s for d in route.depart_s]
+    # an edge is left where the next one is entered, minus the wait at the node in between; the last at arrival
+    leave = [d - w for d, w in zip(enter[1:], route.waits_s[1:], strict=True)] + [route.arrive_s - t0_s] * bool(enter)
+    return RouteTrace(
+        edges=tuple(route.edges),
+        t_enter_s=tuple(enter),
+        t_exit_s=tuple(leave),
+        t_start_s=route.start_s - t0_s,
+        wait_nodes=tuple(route.nodes[:-1]),
+    )
