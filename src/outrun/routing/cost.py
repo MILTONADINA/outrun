@@ -373,11 +373,11 @@ class CostModel:
         self.slot(t_from)  # validates t_from >= 0
         rate = self._wait_rate[node]
         total, t = 0.0, float(t_from)
+        s = self.slot(t)  # step the slot index explicitly: recomputing it from a float boundary can loop
         while t < t_to:  # integrate slot by slot
-            s = self.slot(t)
             end = t_to if s == self.n_slots - 1 else min(t_to, (s + 1) * self._slot_s)
             total += (end - t) * float(rate[s])
-            t = end
+            t, s = end, s + 1
         return total
 
     def has_node_risk(self) -> bool:

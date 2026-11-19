@@ -111,7 +111,7 @@ Each spec owns the listed modules and test file(s), so area work stays file-disj
 | 01-data.md | DATA | `config.py`, `data/*.py` | `tests/unit/test_data*.py`, `tests/unit/test_config.py` |
 | 02-grid-risk.md | GRID, RISK, HORIZON, CAL | `core/*.py`, `hazards/base.py` | `tests/unit/test_grid.py`, `tests/unit/test_risk.py`, `tests/unit/test_policy.py`, `tests/unit/test_scenario.py`, `tests/unit/test_synthetic.py`, `tests/unit/test_calibrate.py`, `tests/unit/test_hazard_base.py` |
 | 03-roads.md | ROAD | `roads/*.py` | `tests/unit/test_roads*.py` |
-| 04-astar.md | ASTAR, PLAN | `routing/cost.py`, `routing/astar.py`, `routing/planner.py` | `tests/unit/test_astar.py`, `tests/unit/test_cost.py`, `tests/unit/test_planner.py` |
+| 04-astar.md | ASTAR, PLAN | `routing/cost.py`, `routing/astar.py`, `routing/planner.py` | `tests/unit/test_astar.py`, `tests/unit/test_astar_regressions.py`, `tests/unit/test_cost.py`, `tests/unit/test_planner.py` |
 | 05-shelters.md | SHEL | `optimize/shelters.py` | `tests/unit/test_shelters*.py` |
 | 06-evacuation.md | EVAC | `optimize/evacuation.py` | `tests/unit/test_evacuation*.py` |
 | 07-emergency.md | EMS | `routing/emergency.py` | `tests/unit/test_emergency*.py` |
