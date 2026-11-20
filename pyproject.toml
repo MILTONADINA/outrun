@@ -34,6 +34,9 @@ dependencies = [
   "networkx>=3.2",
   # optimization
   "ortools>=9.8",
+  # storm baseline (needs OpenMP to build on macOS: CC=/opt/homebrew/bin/gcc-16 pip install pysteps)
+  "pysteps>=1.10",
+  "opencv-python-headless>=4.8",  # pySTEPS Lucas-Kanade backend
   # weather data access
   "herbie-data>=2024.1",
   "cfgrib>=0.9.10",

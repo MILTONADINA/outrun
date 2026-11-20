@@ -24,6 +24,7 @@ matrix). Other requirements are "Should" (evaluation/support); they are still tr
 ### STORM-01 Training windows from the SEVIR event array (Must)
 `dataset.py` constants: `N_FRAMES = 49`, `N_IN = 13`, `N_OUT = 12`, `OFFSETS = (0, 12, 24)`, `VIL_CH = 0`,
 `IR_CH = 1`.
+- Bad-frame rule (decided Nov 20 via the advisor, frozen; never retuned after seeing test): a VIL frame with more than 2 % of pixels equal to 255 (SEVIR no-data fill, present in the raw files, mostly the 2019 Jan-Jun VIL file) is bad. `bad_frames(vil)` flags them; `from_split` builds datasets with `drop_bad=True`, dropping every window that touches a bad frame, for all methods alike (model, baselines, calibration, ablation). Direct construction defaults to `drop_bad=False`.
 
 `window_index(n_events: int, offsets=OFFSETS) -> np.ndarray` returns an int array of shape
 `(n_events * len(offsets), 2)` with rows `(event, offset)` in event-major order

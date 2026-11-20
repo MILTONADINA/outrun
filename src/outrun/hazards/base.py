@@ -295,6 +295,7 @@ def train_model(
             }
         )
 
+        print(f"epoch {epoch}: {history[-1]}", flush=True)
         if val_loss < best_val - cfg.min_delta:  # strict improvement on validation only
             best_val, best_epoch, bad_epochs = val_loss, epoch, 0
             save_checkpoint(best_path, model, epoch=epoch, val_loss=val_loss)

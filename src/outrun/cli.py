@@ -85,6 +85,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--device", choices=("auto", "mps", "cpu"), default="auto")
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--resume", action="store_true")
+    p.add_argument(
+        "--vil-only", dest="vil_only", action="store_true", help="storm: VIL-only ablation (13 channels)"
+    )
+    p.add_argument("--batch-size", dest="batch_size", type=int, default=16)
+    p.add_argument("--patience", type=int, default=5, help="early-stopping patience on val loss")
+    p.add_argument(
+        "--out-dir", dest="out_dir", default=None, help="checkpoint dir (default models/storm[_vil_only])"
+    )
 
     p = sub.add_parser("eval", help="evaluate on val (or, once, on test with --final)")
     p.add_argument("--hazard", choices=(*HAZARD_NAMES, "all"), default="all")
@@ -198,8 +206,51 @@ def cmd_prep(args: argparse.Namespace) -> int:
 
 
 def cmd_train(args: argparse.Namespace) -> int:
-    """Train one hazard model (delegates to ``outrun.hazards.base`` training loop)."""
-    raise NotImplementedError("training entry points arrive with the hazard tasks (T9+)")
+    """Train one hazard model (storm only for now; delegates to ``outrun.hazards.storm.model.train_storm``)."""
+    if args.hazard != "storm":
+        raise NotImplementedError(f"training for {args.hazard!r} arrives with its own hazard task (T9+)")
+
+    import pandas as pd
+
+    from outrun.config import get_paths
+    from outrun.eval.splits import read_split
+    from outrun.hazards.base import select_device
+    from outrun.hazards.storm.dataset import SevirWindowDataset
+    from outrun.hazards.storm.model import train_storm
+
+    paths = get_paths()
+    meta = pd.read_parquet(paths.proc / "sevir" / "sevir.meta.parquet")
+    event_ids = meta["id"].astype(str).tolist()
+    events = np.load(paths.proc / "sevir" / "sevir.npy", mmap_mode="r")
+    split = read_split(paths.splits / "sevir.json")
+    use_ir = not args.vil_only
+    # Only train and val are touched here (held-out discipline, DESIGN 6.3): fit on train, select on val.
+    train_ds = SevirWindowDataset.from_split(events, event_ids, split, "train", use_ir=use_ir)
+    val_ds = SevirWindowDataset.from_split(events, event_ids, split, "val", use_ir=use_ir)
+    out_dir = Path(args.out_dir) if args.out_dir else paths.models / ("storm" if use_ir else "storm_vil_only")
+    device = str(select_device("cpu" if args.device == "cpu" else "mps"))
+    print(
+        f"storm: {len(train_ds)} train / {len(val_ds)} val windows, use_ir={use_ir}, device={device}, out={out_dir}",
+        flush=True,
+    )
+    _, result = train_storm(
+        train_ds,
+        val_ds,
+        out_dir,
+        use_ir=use_ir,
+        batch_size=args.batch_size,
+        device=device,
+        resume=args.resume,
+        max_epochs=args.epochs if args.epochs is not None else 20,
+        patience=args.patience,
+        seed=0 if args.seed is None else args.seed,
+    )
+    print(
+        f"done: best epoch {result.best_epoch} val {result.best_val_loss:.5f}, "
+        f"{result.epochs_run} epochs, stopped_early={result.stopped_early}, best={result.best_checkpoint}",
+        flush=True,
+    )
+    return 0
 
 
 def cmd_eval(args: argparse.Namespace) -> int:

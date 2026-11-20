@@ -39,6 +39,7 @@ from outrun.eval.splits import (
     write_split,
 )
 
+
 def load_cases(path: Path) -> list[CaseStudy]:
     """Read the T7 case-study registry (``splits/cases.json``) as ``CaseStudy`` records (SPLIT-11)."""
     rows = json.loads(path.read_text())["cases"]
