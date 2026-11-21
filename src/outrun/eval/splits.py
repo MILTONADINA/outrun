@@ -12,6 +12,7 @@ day is quarantined (SPLIT-08).
 
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 import math
@@ -459,9 +460,19 @@ def write_split(split: Split, path: str | Path) -> Path:
     return path
 
 
+def _read_bytes(path: str | Path) -> bytes:
+    """Bytes of a split file; falls back to ``<path>.gz`` (large splits are stored gzipped, GitHub 100 MB cap).
+    Hashes are always over the uncompressed canonical bytes, so compression never changes them."""
+    path = Path(path)
+    if not path.exists() and path.suffix == ".json" and path.with_name(path.name + ".gz").exists():
+        path = path.with_name(path.name + ".gz")
+    raw = path.read_bytes()
+    return gzip.decompress(raw) if path.name.endswith(".gz") else raw
+
+
 def read_split(path: str | Path) -> Split:
     """SPLIT-10. Inverse of ``write_split``: ``read_split(write_split(s, p)) == s``."""
-    obj = json.loads(Path(path).read_text())
+    obj = json.loads(_read_bytes(path))
     return Split(
         obj["dataset"],
         tuple(_obj_item(o) for o in obj["train"]),
@@ -478,7 +489,7 @@ def split_hash(split: Split) -> str:
 
 
 def _hash_entry(path: Path) -> dict[str, str]:
-    raw = path.read_bytes()
+    raw = _read_bytes(path)
     entry = {"file_sha256": hashlib.sha256(raw).hexdigest()}
     obj = json.loads(raw)
     if isinstance(obj, dict) and {"train", "val", "test"} <= set(obj):
@@ -488,7 +499,9 @@ def _hash_entry(path: Path) -> dict[str, str]:
 
 
 def _json_files(splits_dir: Path) -> dict[str, Path]:
-    return {p.stem: p for p in sorted(splits_dir.glob("*.json")) if p.name != "hashes.json"}
+    files = {p.name[: -len(".json.gz")]: p for p in sorted(splits_dir.glob("*.json.gz"))}
+    files.update({p.stem: p for p in sorted(splits_dir.glob("*.json")) if p.name != "hashes.json"})
+    return files
 
 
 def write_hashes(splits_dir: str | Path) -> dict[str, dict[str, str]]:

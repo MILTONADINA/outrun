@@ -33,6 +33,7 @@ from outrun.eval.splits import (
     flood_split,
     load_quarantine,
     sevir_split,
+    smoke_split,
     tornet_split,
     wildfire_split,
     write_hashes,
@@ -138,6 +139,27 @@ def freeze_flood(table: Path, out: Path = Path("splits"), test_year: int = 2025)
     split = flood_split(samples, quarantine=q, test_year=test_year)
     assert_valid_split(split)
     write_split(split, out / "flood.json")
+    write_hashes(out)
+    return split
+
+
+def freeze_smoke(samples: Path, sites: Path, out: Path = Path("splits")) -> Split:
+    """T18: freeze ``splits/smoke.json`` from the smoke sample table (ids + issue times) and monitor coordinates.
+
+    Run before any smoke fitting. Only ids, times and EPSG:5070 site coordinates are read (no PM values). The
+    spatial holdout (20 % of monitors in whole 200 km blocks, seed 0) and the quarantine come from ``smoke_split``;
+    only smoke.json and hashes.json are written.
+    """
+    tab = pd.read_parquet(samples, columns=["site_id", "issue_time"])
+    mon = pd.read_parquet(sites, columns=["site_id", "x_m", "y_m"])
+    monitors = {
+        str(s): (float(x), float(y)) for s, x, y in zip(mon["site_id"], mon["x_m"], mon["y_m"], strict=True)
+    }
+    items = [(str(s), t.to_pydatetime()) for s, t in zip(tab["site_id"], tab["issue_time"], strict=True)]
+    q = load_quarantine(out / "quarantine.json")
+    split = smoke_split(items, monitors, quarantine=q)
+    assert_valid_split(split)
+    write_split(split, out / "smoke.json")
     write_hashes(out)
     return split
 

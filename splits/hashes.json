@@ -21,6 +21,10 @@
     "file_sha256": "0904c8f7415f024ca6dd0a7d73c59c4ff714c4ab60fa0e41d2ca43a05c12299f",
     "test_ids_sha256": "e73c4d6035664c1b636fa958d2d4071f79b815d4c13c6d658b63de98d10552c7"
   },
+  "smoke": {
+    "file_sha256": "5cf17adc2712fd08679f79aac4a04e952fba9d910c024d33dc0ac8a68e84fa78",
+    "test_ids_sha256": "48ebd90a90862572694742d3769ffc4b94647c61f3041397200a6b14ef86e2c3"
+  },
   "tornet": {
     "file_sha256": "aed2054c8833c24cf6826732327b582b35a895fbaa1edace07e4a75ce4b7dd56",
     "test_ids_sha256": "9e3e4da0fafd2ac5899b45e218d90979a43a36ab3c6f4a0c7bd1043331d4e26b"

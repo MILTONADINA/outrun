@@ -91,6 +91,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--no-flash", dest="no_flash", action="store_true", help="flood: no-FLASH ablation (8 channels)"
     )
+    p.add_argument("--no-hms", dest="no_hms", action="store_true", help="smoke: no-HMS ablation (10 tabular features)")
     p.add_argument("--batch-size", dest="batch_size", type=int, default=16)
     p.add_argument("--patience", type=int, default=5, help="early-stopping patience on val loss")
     p.add_argument(
@@ -218,6 +219,8 @@ def cmd_train(args: argparse.Namespace) -> int:
         return _train_flood(args)
     if args.hazard == "ice":
         return _train_ice(args)
+    if args.hazard == "smoke":
+        return _train_smoke(args)
     if args.hazard != "storm":
         raise NotImplementedError(f"training for {args.hazard!r} arrives with its own hazard task (T9+)")
 
@@ -363,6 +366,29 @@ def _train_ice(args: argparse.Namespace) -> int:
         f"{result.epochs_run} epochs, stopped_early={result.stopped_early}, best={result.best_checkpoint}",
         flush=True,
     )
+    return 0
+
+
+def _train_smoke(args: argparse.Namespace) -> int:
+    """Smoke CNN+MLP on the frozen smoke train samples, early-stopped on val pinball loss (``hazards.smoke.train``)."""
+    from outrun.config import get_paths
+    from outrun.hazards.base import select_device
+    from outrun.hazards.smoke.train import train_smoke
+
+    no_hms = bool(getattr(args, "no_hms", False))
+    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / ("smoke_nohms" if no_hms else "smoke")
+    device = str(select_device("cpu" if args.device == "cpu" else "mps"))
+    _, result = train_smoke(
+        out_dir,
+        use_hms=not no_hms,
+        batch_size=args.batch_size if args.batch_size != 16 else 2048,
+        device=device,
+        resume=args.resume,
+        max_epochs=args.epochs if args.epochs is not None else 25,
+        patience=args.patience if args.patience != 5 else 4,
+        seed=0 if args.seed is None else args.seed,
+    )
+    print(f"done: {result}", flush=True)
     return 0
 
 
