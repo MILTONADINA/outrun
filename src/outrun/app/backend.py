@@ -214,8 +214,44 @@ class DefaultBackend:
 
     def run_evac(self, scenario_id: str) -> Iterator[EvacEvent]:
         """Progress events straight from ``simulated_annealing``'s ``callback(iteration, current_J, best_J,
-        temperature)`` (EVAC-06): ``{"iter": iteration, "objective": current_J, "temperature": temperature}``."""
-        raise NotImplementedError("live evacuation is wired in T23 (needs T19 simulated annealing)")
+        temperature)`` (EVAC-06): ``{"iter": iteration, "objective": current_J, "temperature": temperature}``.
+
+        Needs the instance built by ``python -m outrun.optimize.okc_evacuation`` (``LookupError`` if absent, so the
+        server falls back to the cached run). SA runs in a worker thread; the last event is ``("done", result)``."""
+        import pickle
+        import queue
+        import threading
+
+        from outrun.optimize.evacuation import EvacEvaluator, evac_metrics, simulated_annealing
+        from outrun.optimize.okc_evacuation import cache_path, result_geojson
+
+        path = cache_path(scenario_id)
+        if not path.is_file():
+            raise LookupError("no prepared evacuation instance for this scenario")
+        oe = pickle.loads(path.read_bytes())
+        ev = EvacEvaluator(oe.instance)
+        events: queue.Queue = queue.Queue()
+
+        def progress(iteration: int, current_j: float, _best_j: float, temperature: float) -> None:
+            events.put(("progress", {"iter": iteration, "objective": current_j, "temperature": temperature}))
+
+        def work() -> None:
+            try:
+                res = simulated_annealing(
+                    ev, iterations=8000, zone_adjacency=oe.zone_adjacency, callback=progress, callback_every=100
+                )
+                events.put(("done", result_geojson(oe, res.best_plan, evac_metrics(ev, res.best_plan))))
+            except Exception as exc:  # reported to the client as an SSE error event
+                events.put(("error", {"detail": str(exc)}))
+
+        threading.Thread(target=work, daemon=True).start()
+        while True:
+            kind, data = events.get()
+            if kind == "error":
+                raise RuntimeError(data["detail"])
+            yield kind, data
+            if kind == "done":
+                return
 
     def city(self, name: str, allow_network: bool) -> dict[str, Any]:
         """Load the cached drive graph of ``name``; build it from OpenStreetMap only if the network is allowed."""
