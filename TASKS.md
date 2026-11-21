@@ -25,7 +25,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T18 (Nov 27) [W] Smoke: CNN+MLP quantile model, baselines, spatial holdout (checkpoint: 6/6 layers)
 - [x] T19 (Nov 28) Evacuation: wave-BPR evaluator, SA, MSA, shortest/safest, SSE
 - [x] T20 (Nov 28) Wildfire scenarios: WSTS 2021 demo fire + labelled OK Mar 2025 replay
-- [ ] T21 (Nov 29) EMS dispatch + shelter-in-place rule
+- [x] T21 (Nov 29) EMS dispatch + shelter-in-place rule
 - [ ] T22 (Nov 29) Scenario bundles for all scenarios; [overnight] build
 - [ ] T23 (Nov 30) App: all tabs, offline Playwright test
 - [ ] T24 (Dec 1) One-shot test evaluation, routing eval, acceptance (feature freeze)

@@ -120,6 +120,7 @@ class DefaultBackend:
     def __init__(self, scenarios_dir: Path) -> None:
         self.scenarios_dir = Path(scenarios_dir)
         self._loaded: dict[tuple[str, str], tuple[Any, Any, Any, Any]] = {}  # (scenario, stack file) -> arrays
+        self._hardened: dict[str, list[int]] = {}  # scenario -> hospital/school graph nodes (PLAN-04)
         self._models: dict[tuple, Any] = {}  # built CostModels, so a second click skips the ~1 s table build
 
     # ---- loading (cached per scenario so a click does not reload the graph)
@@ -171,6 +172,35 @@ class DefaultBackend:
             raise LookupError("scenario has no shelters")
         return sorted({self._nearest_node(graph, lon, lat) for lon, lat in points})
 
+    def _hardened_nodes(self, graph: Any, scenario_id: str, origin: int, keep: int = 8) -> list[int]:
+        """Hospital and school nodes for the shelter-in-place rule (PLAN-04): the ``keep`` nearest to ``origin`` that
+        a 5 min drive can reach at crow-fly top speed (the rule runs one A* per candidate). Empty if the HIFLD data
+        is absent."""
+        import numpy as np
+
+        from outrun.routing.cost import crowfly_speed_mps
+        from outrun.routing.planner import HARDENED_MAX_DRIVE_S
+
+        if scenario_id not in self._hardened:
+            try:
+                from outrun.config import get_paths
+                from outrun.data.facilities import load_hifld_facilities
+                from outrun.routing.okc_ems import snap_nodes
+
+                bbox = tuple(json.loads((self.scenarios_dir / scenario_id / "scenario.json").read_text())["bbox"])
+                df = load_hifld_facilities(get_paths().raw, bbox)
+                df = df[df["kind"].isin(["hospital", "school"])]
+                nodes = snap_nodes(graph, df[["lon", "lat"]].to_numpy(dtype=float)) if len(df) else np.array([], int)
+                self._hardened[scenario_id] = sorted({int(n) for n in nodes})
+            except (OSError, LookupError, KeyError):  # no facility files: the rule falls back to plain shelter-in-place
+                self._hardened[scenario_id] = []
+        nodes = np.asarray(self._hardened[scenario_id], dtype=np.int64)
+        if not len(nodes):
+            return []
+        d = np.hypot(graph.x_m[nodes] - graph.x_m[origin], graph.y_m[nodes] - graph.y_m[origin])
+        near = np.argsort(d)[:keep]
+        return [int(nodes[k]) for k in near if d[k] <= HARDENED_MAX_DRIVE_S * crowfly_speed_mps(graph)]
+
     # ---- AppBackend
     def route(self, req: RouteRequest) -> dict[str, Any]:
         from outrun.config import load_config
@@ -203,14 +233,28 @@ class DefaultBackend:
         else:
             goals = [self._nearest_node(graph, *req.dest)]
 
-        plan = plan_route(graph, planning, origin, goals, t0_s)
+        hardened = self._hardened_nodes(graph, req.scenario, origin)
+        plan = plan_route(graph, planning, origin, goals, t0_s, hardened=hardened)
         shortest = plan_shortest_time(graph, planning, origin, goals, t0_s)
         out = route_fields(plan, shortest, planning, observed, graph)
         out["expansions"] = search_effort(graph, planning, origin, goals, t0_s)
         return out
 
     def dispatch(self, req: DispatchRequest) -> dict[str, Any]:
-        raise NotImplementedError("live dispatch is wired in T23 (needs T21 emergency routing)")
+        """Hungarian dispatch from the HIFLD fire/EMS stations of the scenario bbox (EV profile, model risk), the
+        hospital leg and the hazard-blind baseline (APP-06). ``LookupError`` -> the server answers 503."""
+        import numpy as np
+
+        from outrun.core.policy import Profile
+        from outrun.routing.okc_ems import load_facility_points, plan_dispatch
+
+        folder = self.scenarios_dir / req.scenario
+        graph, stack, edge_risk, node_risk = self._load(req.scenario, "")
+        bbox = tuple(json.loads((folder / "scenario.json").read_text())["bbox"])
+        stations, hospitals = load_facility_points(bbox)
+        t0_s = 0.0 if req.t0 is None else max(0.0, (req.t0 - stack.t0).total_seconds())
+        model = self._cost_model((req.scenario, "", "ev", 1.0), graph, edge_risk, node_risk, Profile.EV, 1.0)
+        return plan_dispatch(graph, model, stations, hospitals, np.asarray(req.incidents, dtype=float), t0_s)
 
     def run_evac(self, scenario_id: str) -> Iterator[EvacEvent]:
         """Progress events straight from ``simulated_annealing``'s ``callback(iteration, current_J, best_J,

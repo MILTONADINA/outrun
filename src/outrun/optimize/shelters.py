@@ -159,73 +159,6 @@ def filter_unsafe_sites(
     return [s for s, bad in zip(sites, unsafe, strict=True) if not bad]
 
 
-def _edge_weight(data: Mapping[str, object], weight: str):
-    """Edge time weight as a float or a list of per-slot floats; None when missing / blocked (inf)."""
-    w = data.get(weight)
-    if w is None:
-        return None
-    if np.ndim(w) == 0:
-        w = float(w)  # type: ignore[arg-type]
-        return None if np.isinf(w) else w
-    return [float(v) for v in w]  # type: ignore[union-attr]
-
-
-def _durations_to(graph: nx.DiGraph, target, sources, depart_s, weight, slot_s) -> np.ndarray:
-    """Earliest-arrival seconds from each source (leaving at ``depart_s``) to ``target``; inf if unreachable.
-
-    Scalar weights: one Dijkstra from the target over the reversed graph. Per-slot weights: a forward label-setting
-    search per source (exact under FIFO weights), stopped once the target is settled.
-    """
-    import heapq
-
-    import networkx as nx
-
-    if target not in graph:
-        raise KeyError(target)
-    for s in sources:
-        if s not in graph:
-            raise KeyError(s)
-    out = np.full(len(sources), np.inf)
-    time_dependent = any(
-        np.ndim(d.get(weight)) > 0 for _, _, d in graph.edges(data=True) if d.get(weight) is not None
-    )
-    if not time_dependent:
-
-        def w(_u, _v, d):
-            x = _edge_weight(d, weight)
-            return x  # None skips the edge
-
-        dist = nx.single_source_dijkstra_path_length(graph.reverse(copy=False), target, weight=w)
-        for i, s in enumerate(sources):
-            out[i] = dist.get(s, np.inf)
-        return out
-    for i, s in enumerate(sources):
-        best = {s: depart_s}
-        heap = [(depart_s, 0, s)]
-        tick = 0
-        done = set()
-        while heap:
-            t, _, u = heapq.heappop(heap)
-            if u in done:
-                continue
-            done.add(u)
-            if u == target:
-                out[i] = t - depart_s
-                break
-            for v, d in graph[u].items():
-                w = _edge_weight(d, weight)
-                if w is None:
-                    continue
-                tau = w if not isinstance(w, list) else w[min(int(t // slot_s), len(w) - 1)]
-                if np.isinf(tau):
-                    continue
-                if t + tau < best.get(v, np.inf):
-                    best[v] = t + tau
-                    tick += 1
-                    heapq.heappush(heap, (t + tau, tick, v))
-    return out
-
-
 def travel_cost_matrix(
     graph: nx.DiGraph,
     zone_nodes: Sequence[Hashable],
@@ -236,9 +169,10 @@ def travel_cost_matrix(
 ) -> np.ndarray:
     """SHEL-04: (Z, S) time-dependent earliest-arrival seconds, one reverse search per shelter (EMS-01).
 
-    The search is a private helper (same semantics as ``routing.emergency.td_travel_times_to``) so shelters do not
-    depend on the EMS module being implemented.
+    Uses ``routing.emergency.td_travel_times_to`` (EMS-01).
     """
+    from outrun.routing.emergency import td_travel_times_to
+
     slot = _DEFAULT_SLOT_S if slot_s is None else slot_s
     zones = list(zone_nodes)
     for z in zones:
@@ -246,7 +180,7 @@ def travel_cost_matrix(
             raise KeyError(z)
     cost = np.full((len(zones), len(shelter_nodes)), np.inf)
     for j, sn in enumerate(shelter_nodes):
-        cost[:, j] = _durations_to(graph, sn, zones, depart_s, weight, slot)
+        cost[:, j] = td_travel_times_to(graph, sn, zones, depart_s, weight, slot)
     return cost
 
 
