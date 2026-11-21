@@ -2,6 +2,14 @@
   "cases": {
     "file_sha256": "d78dd76375ed0ecdf9f3abb7461c4bb96bac7277e6455693cae5364504e46656"
   },
+  "flood": {
+    "file_sha256": "b271446389b834a1ea1dd5ca2671130a9ca927a4f3840d826dcf56753ff52939",
+    "test_ids_sha256": "549838fd42e833f8843c9e2e5dd8d46560c3dc5dc83887e7b22787aa31842810"
+  },
+  "ice": {
+    "file_sha256": "1a83686035ecd3bba1e9e836c6872ba21dce4cc3af62b7c1e17c5611eb888007",
+    "test_ids_sha256": "cc1cf7f93793c8ccdbf175e06e7d5f03a8a3d12b41d8fb97c32814c629535717"
+  },
   "ndws": {
     "file_sha256": "b9dd549a35a45bf42bb8a68934f2fa96148b7e152ad7818063e9a901c0657a07",
     "test_ids_sha256": "eda961d032bee87a942bceb28d8d14e1a9b648ddfb6670145b9702670a61ea0a"

@@ -30,6 +30,7 @@ from outrun.eval.casestudy import CaseStudy, case_quarantine
 from outrun.eval.splits import (
     Split,
     assert_valid_split,
+    flood_split,
     load_quarantine,
     sevir_split,
     tornet_split,
@@ -122,9 +123,30 @@ def wsts_fires(raw: Path) -> list[tuple[str, date]]:
     return sorted(first.items())
 
 
+def freeze_flood(table: Path, out: Path = Path("splits"), test_year: int = 2025) -> Split:
+    """T14: freeze ``splits/flood.json`` from the flood sample table (ids + issue hours, no features or labels).
+
+    Only flood.json and hashes.json are touched; the other split files are neither rewritten nor re-derived, and
+    ``write_hashes`` keeps their entries byte-identical (it hashes the unchanged files).
+    """
+    from datetime import timedelta
+
+    tab = pd.read_parquet(table)
+    epoch = datetime(2021, 1, 1, tzinfo=UTC)
+    samples = [(i, epoch + timedelta(hours=int(h))) for i, h in zip(tab["id"], tab["hour"], strict=True)]
+    q = load_quarantine(out / "quarantine.json")
+    split = flood_split(samples, quarantine=q, test_year=test_year)
+    assert_valid_split(split)
+    write_split(split, out / "flood.json")
+    write_hashes(out)
+    return split
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--raw", type=Path, default=None, help="RAW root (default: OUTRUN_RAW or /Volumes/OutrunRaw)")
+    ap.add_argument(
+        "--raw", type=Path, default=None, help="RAW root (default: OUTRUN_RAW or /Volumes/OutrunRaw)"
+    )
     ap.add_argument("--out", type=Path, default=Path("splits"))
     ap.add_argument("--cases", type=Path, default=None, help="case registry (default: <out>/cases.json)")
     a = ap.parse_args(argv)

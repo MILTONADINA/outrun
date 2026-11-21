@@ -211,6 +211,8 @@ def cmd_train(args: argparse.Namespace) -> int:
         return _train_tornado(args)
     if args.hazard == "wildfire":
         return _train_wildfire(args)
+    if args.hazard == "flood":
+        return _train_flood(args)
     if args.hazard != "storm":
         raise NotImplementedError(f"training for {args.hazard!r} arrives with its own hazard task (T9+)")
 
@@ -291,6 +293,31 @@ def _train_wildfire(args: argparse.Namespace) -> int:
     out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / "wildfire"
     device = str(select_device("cpu" if args.device == "cpu" else "mps"))
     _, result = train_wildfire(
+        out_dir,
+        batch_size=args.batch_size,
+        device=device,
+        resume=args.resume,
+        max_epochs=args.epochs if args.epochs is not None else 30,
+        patience=args.patience,
+        seed=0 if args.seed is None else args.seed,
+    )
+    print(
+        f"done: best epoch {result.best_epoch} val {result.best_val_loss:.5f}, "
+        f"{result.epochs_run} epochs, stopped_early={result.stopped_early}, best={result.best_checkpoint}",
+        flush=True,
+    )
+    return 0
+
+
+def _train_flood(args: argparse.Namespace) -> int:
+    """Flood U-Net on the frozen flood train split, early-stopped on val loss (``hazards.flood.train``)."""
+    from outrun.config import get_paths
+    from outrun.hazards.base import select_device
+    from outrun.hazards.flood.train import train_flood
+
+    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / "flood"
+    device = str(select_device("cpu" if args.device == "cpu" else "mps"))
+    _, result = train_flood(
         out_dir,
         batch_size=args.batch_size,
         device=device,
