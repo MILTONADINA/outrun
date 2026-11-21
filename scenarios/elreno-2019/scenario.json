@@ -10,15 +10,19 @@
     35.8
   ],
   "hazards": [
-    "storm"
+    "storm",
+    "tornado"
   ],
   "held_out": true,
   "synthetic": false,
   "sources": [
     "model: storm.unet_vil_only@S830307 (forecast)",
+    "model: tornado.cnn@elreno (forecast)",
     "baseline: storm.pysteps_extrapolation@S830307 (baseline)",
+    "baseline: tornado.delta_v_rule (baseline)",
     "observed: storm.observed_sevir (observed)",
     "SEVIR VIL (NEXRAD) 2 km, regridded to EPSG:5070 1 km",
+    "tornado: TorNet KTLX chips (ending <= t0+35 min, demo timing slack), swath along storm-provider motion (fallback HRRR/default)",
     "OSM roads (cached OKC graph)"
   ],
   "n_slots": 12,

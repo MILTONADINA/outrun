@@ -58,6 +58,24 @@ def _scores(meta, p: np.ndarray, centers: np.ndarray, threshold: float) -> dict:
     )
 
 
+def pick_operating_threshold(meta, p_cal: np.ndarray, centers: np.ndarray) -> dict:
+    """Val-only operating point on calibrated probabilities: the cut with the best CSI (ties -> higher cut).
+
+    Calibrated P rarely reaches the spec's 0.5, so 0.5 gives POD ~ 0.03 on val. This cut is chosen on val only and
+    written to ``operating_point.json`` (frozen: never re-picked on test or case-holdout chips).
+    """
+    grid = np.unique(np.quantile(p_cal, np.linspace(0.5, 0.999, 300)))
+    csi = np.array([_scores(meta, p_cal, centers, float(t))["csi"] for t in grid])
+    best = int(len(grid) - 1 - np.nanargmax(csi[::-1]))
+    return {
+        "selected_on": "val",
+        "threshold_calibrated": float(grid[best]),
+        "criterion": "max CSI on val, calibrated probabilities",
+        "scores_at_threshold": _scores(meta, p_cal, centers, float(grid[best])),
+        "frozen": True,
+    }
+
+
 def cnn_val_probs(ckpt: Path, device: str = "cpu", batch_size: int = 64) -> np.ndarray:
     """Raw CNN probabilities on every val chip."""
     import torch
@@ -112,6 +130,9 @@ def main(argv: list[str] | None = None) -> int:
         cal = IsotonicCalibrator().fit(p, va_meta["label"].to_numpy())
         (ckpt.with_name("calibrator.json")).write_text(json.dumps(cal.to_dict()))
         results["cnn_calibrated_on_val"] = _scores(va_meta, cal.transform(p), va_centers, 0.5)
+        op = pick_operating_threshold(va_meta, cal.transform(p), va_centers)
+        results["operating_point"] = op
+        ckpt.with_name("operating_point.json").write_text(json.dumps(op, indent=1))
         # best-CSI cut on val (a val-selected operating point, reported alongside the spec's 0.5)
         grid = np.unique(np.quantile(p, np.linspace(0.5, 0.999, 200)))
         csi = [_scores(va_meta, p, va_centers, float(t))["csi"] for t in grid]

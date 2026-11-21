@@ -16,7 +16,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T9 (Nov 22) Storm: val eval, calibration, DL adapter with decay; [overnight] VIL-only ablation + TorNet prep
 - [x] T10 (Nov 23) Tornado: dataset, GBM + dV baselines, CNN; [overnight] train
 - [x] T11 (Nov 23) [W] Shelters: facilities + census, min-cost flow + nearest/greedy
-- [ ] T12 (Nov 24) Tornado: val eval, swath adapter + motion fallback (checkpoint: storm + tornado DL live)
+- [x] T12 (Nov 24) Tornado: val eval, swath adapter + motion fallback (checkpoint: storm + tornado DL live)
 - [ ] T13 (Nov 24) [W] Wildfire: NDWS U-Net + baselines, WSTS mapper, demo fire
 - [ ] T14 (Nov 25) Flood: features, ring labels, hard negatives, baselines; [overnight] U-Net
 - [ ] T15 (Nov 25) [W] Ice: zone bags, keyword labels, physics-rule + climatology baselines
