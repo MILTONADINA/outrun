@@ -28,6 +28,7 @@ from outrun.core.risk import Hazard
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 PRESET_MATCH_RADIUS_M = 250.0
 EARTH_RADIUS_M = 6_371_008.8
+AUTO = "auto"  # create_app default: wire DefaultBackend over ``scenarios_dir``; pass ``backend=None`` for cached-only
 
 
 def haversine_m(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
@@ -74,13 +75,15 @@ def _cached_route(folder: Path, req: RouteRequest) -> dict[str, Any] | None:
 def create_app(
     scenarios_dir: Path | str = "scenarios",
     reports_dir: Path | str = "reports",
-    backend: AppBackend | None = None,
+    backend: AppBackend | None | str = AUTO,
     demo: bool | None = None,
 ) -> FastAPI:
     """Build the app.
 
     - ``scenarios_dir``: bundles (layout in specs/14-app.md); ``reports_dir``: ``metrics/*.json``.
-    - ``backend``: live planners (``None`` = cached-only mode: routes from presets, SA replayed, dispatch/city 503).
+    - ``backend``: live planners. Default ``AUTO`` wires ``DefaultBackend(scenarios_dir)`` (live A*, dispatch, SA, city;
+      any call that fails falls back to the cached results). ``None`` = cached-only mode: routes from presets,
+      SA replayed, dispatch/city 503.
     - ``demo``: ``None`` reads ``OUTRUN_DEMO == "1"``; demo mode forbids network for the city box.
 
     Routes: ``GET /`` and ``/static/*`` (APP-09), ``GET /api/health`` (APP-15), ``GET /api/scenarios`` (APP-01),
@@ -92,6 +95,12 @@ def create_app(
     scenarios_root = Path(scenarios_dir)
     reports_root = Path(reports_dir)
     demo_mode = os.environ.get("OUTRUN_DEMO") == "1" if demo is None else demo
+    if backend == AUTO:
+        from outrun.app.backend import (
+            DefaultBackend,  # lazy: the backend imports its heavy modules per call (APP-10)
+        )
+
+        backend = DefaultBackend(scenarios_root)
     app = FastAPI(title="Outrun")
 
     def scenario_folder(scenario_id: str) -> tuple[Path, dict[str, Any]]:

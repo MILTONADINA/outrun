@@ -12,7 +12,12 @@ nav button.active { background: #e8590c; }
 
 main { flex: 1; display: flex; min-height: 0; }
 #panel { width: 290px; padding: 12px; overflow-y: auto; background: #f4f6f8; border-right: 1px solid #d5dbe1; }
-#map { flex: 1; min-width: 0; }
+#map-wrap { flex: 1; min-width: 0; position: relative; }
+#map, #map2 { position: absolute; inset: 0; }
+#map2 { pointer-events: none; }
+#swipe-bar { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; box-shadow: 0 0 4px #0008; pointer-events: none; z-index: 3; }
+.swipe-tag { position: absolute; top: 8px; padding: 3px 8px; background: #17212bcc; color: #fff; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 3; }
+#swipe-left { left: 8px; } #swipe-right { right: 8px; }
 
 h2 { margin: 0 0 8px; font-size: 16px; }
 label { display: block; margin-bottom: 8px; }
@@ -28,3 +33,27 @@ th:first-child, td:first-child { text-align: left; }
 .c-outrun { color: #1971c2; }
 .c-short { color: #666; }
 [hidden] { display: none !important; }
+
+.card { background: #fff; border: 1px solid #d5dbe1; border-radius: 6px; padding: 8px; margin-bottom: 10px; font-size: 12px; }
+.card h3 { margin: 0 0 4px; font-size: 13px; }
+.card.warn { background: #fff3bf; border-color: #f08c00; }
+.badge { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 11px; color: #fff; background: #5b6773; margin-right: 4px; }
+.badge.held { background: #c2255c; } .badge.synth { background: #868e96; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.chips button { border: 1px solid #adb5bd; background: #fff; border-radius: 12px; padding: 2px 10px; }
+.chips button.on { background: #1971c2; color: #fff; border-color: #1971c2; }
+.row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+label.inline { display: inline-block; margin: 0; }
+.strip { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.strip .kpi { background: #fff; border: 1px solid #d5dbe1; border-radius: 4px; padding: 3px 6px; font-size: 11px; }
+.strip .kpi b { display: block; font-size: 14px; }
+.strip .kpi.bad { background: #ffe3e3; border-color: #c92a2a; color: #c92a2a; }
+.bars .bar { margin: 3px 0; font-size: 11px; }
+.bars .track { background: #dee2e6; height: 8px; border-radius: 4px; overflow: hidden; }
+.bars .fill { background: #2f9e44; height: 100%; }
+.bars .fill.over { background: #e03131; }
+#sa-curve { width: 100%; background: #fff; border: 1px solid #d5dbe1; }
+#drawer { position: fixed; top: 52px; right: 0; bottom: 0; width: 340px; background: #fff; border-left: 1px solid #adb5bd; padding: 12px; overflow-y: auto; z-index: 10; box-shadow: -3px 0 8px #0003; }
+#drawer-close { float: right; }
+#drawer table td, #drawer table th { font-size: 12px; }
+.tbl-scroll { overflow-x: auto; }
