@@ -1,0 +1,26 @@
+{
+  "id": "elreno-2019",
+  "title": "El Reno EF3, 2019-05-26 (SEVIR S830307)",
+  "t0": "2019-05-26T03:00:00+00:00",
+  "city": "El Reno / Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "storm"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: storm.unet_vil_only@S830307 (forecast)",
+    "baseline: storm.pysteps_extrapolation@S830307 (baseline)",
+    "observed: storm.observed_sevir (observed)",
+    "SEVIR VIL (NEXRAD) 2 km, regridded to EPSG:5070 1 km",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15
+}
