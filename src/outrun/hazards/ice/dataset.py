@@ -164,3 +164,18 @@ def build_bag_input(
     x[2 * n, : r1 - r0, : c1 - c0] = elevation[r0:r1, c0:c1]
     x[2 * n + 1, : r1 - r0, : c1 - c0] = zone_mask[r0:r1, c0:c1]
     return x, x[2 * n + 1] > 0.5
+
+
+def normalize_bag_input(x: np.ndarray) -> np.ndarray:
+    """Fixed unit scaling of a raw ICE-03 input ``(..., 20, H, W)`` for the CNN (no fitted statistics).
+
+    Temperatures: (K - 273.15) / 15. Categorical fields stay 0/1. PRATE (kg m-2 s-1) -> log1p(mm/h), FRZR -> log1p(x).
+    Elevation / 1000 m. The zone-mask channel (19) is unchanged, so ``x[..., 19, :, :] > 0.5`` is still the mask.
+    """
+    out = np.array(x, dtype=np.float32, copy=True)
+    for base in (0, len(ICE_FIELDS)):
+        out[..., base : base + 3, :, :] = (out[..., base : base + 3, :, :] - 273.15) / 15.0
+        out[..., base + 7, :, :] = np.log1p(np.maximum(out[..., base + 7, :, :], 0.0) * 3600.0)
+        out[..., base + 8, :, :] = np.log1p(np.maximum(out[..., base + 8, :, :], 0.0))
+    out[..., 2 * len(ICE_FIELDS), :, :] /= 1000.0
+    return out

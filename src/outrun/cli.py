@@ -88,6 +88,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--vil-only", dest="vil_only", action="store_true", help="storm: VIL-only ablation (13 channels)"
     )
+    p.add_argument(
+        "--no-flash", dest="no_flash", action="store_true", help="flood: no-FLASH ablation (8 channels)"
+    )
     p.add_argument("--batch-size", dest="batch_size", type=int, default=16)
     p.add_argument("--patience", type=int, default=5, help="early-stopping patience on val loss")
     p.add_argument(
@@ -213,6 +216,8 @@ def cmd_train(args: argparse.Namespace) -> int:
         return _train_wildfire(args)
     if args.hazard == "flood":
         return _train_flood(args)
+    if args.hazard == "ice":
+        return _train_ice(args)
     if args.hazard != "storm":
         raise NotImplementedError(f"training for {args.hazard!r} arrives with its own hazard task (T9+)")
 
@@ -315,7 +320,8 @@ def _train_flood(args: argparse.Namespace) -> int:
     from outrun.hazards.base import select_device
     from outrun.hazards.flood.train import train_flood
 
-    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / "flood"
+    no_flash = bool(getattr(args, "no_flash", False))
+    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / ("flood_noflash" if no_flash else "flood")
     device = str(select_device("cpu" if args.device == "cpu" else "mps"))
     _, result = train_flood(
         out_dir,
@@ -323,6 +329,32 @@ def _train_flood(args: argparse.Namespace) -> int:
         device=device,
         resume=args.resume,
         max_epochs=args.epochs if args.epochs is not None else 30,
+        patience=args.patience,
+        seed=0 if args.seed is None else args.seed,
+        use_flash=not no_flash,
+    )
+    print(
+        f"done: best epoch {result.best_epoch} val {result.best_val_loss:.5f}, "
+        f"{result.epochs_run} epochs, stopped_early={result.stopped_early}, best={result.best_checkpoint}",
+        flush=True,
+    )
+    return 0
+
+
+def _train_ice(args: argparse.Namespace) -> int:
+    """Ice MIL-CNN on the frozen ice train bags, early-stopped on val loss (``hazards.ice.train``)."""
+    from outrun.config import get_paths
+    from outrun.hazards.base import select_device
+    from outrun.hazards.ice.train import train_ice
+
+    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / "ice"
+    device = str(select_device("cpu" if args.device == "cpu" else "mps"))
+    _, result = train_ice(
+        out_dir,
+        batch_size=args.batch_size,
+        device=device,
+        resume=args.resume,
+        max_epochs=args.epochs if args.epochs is not None else 12,
         patience=args.patience,
         seed=0 if args.seed is None else args.seed,
     )
