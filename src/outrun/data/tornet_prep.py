@@ -90,9 +90,18 @@ def _worker(year: int, tar_path: str, out: str, ids: dict[str, list[str]], q: mp
                 print(f"[{year}] {n_chips}/{len(where)} chips, {time.time() - t0:.0f}s", flush=True)
     for arr in (*x.values(), *rk.values(), *az.values(), *qc.values()):
         arr.flush()
-    q.put({"year": year, "n": n_chips, "missing_in_tar": sorted(set(where) - seen)[:20],
-           "n_missing_in_tar": len(set(where) - seen), "vmin": vmin, "vmax": vmax,
-           "mean_nan_frac": {v: nan_sum[v] / max(n_chips, 1) for v in VARIABLES}, "seconds": time.time() - t0})
+    q.put(
+        {
+            "year": year,
+            "n": n_chips,
+            "missing_in_tar": sorted(set(where) - seen)[:20],
+            "n_missing_in_tar": len(set(where) - seen),
+            "vmin": vmin,
+            "vmax": vmax,
+            "mean_nan_frac": {v: nan_sum[v] / max(n_chips, 1) for v in VARIABLES},
+            "seconds": time.time() - t0,
+        }
+    )
 
 
 def main() -> int:
@@ -103,8 +112,11 @@ def main() -> int:
     sj = json.loads((root / "splits" / "tornet.json").read_text())
     ids = _ids(sj)
     cat = pd.read_csv(raw / "tornet_catalog" / "catalog.csv").set_index("filename")
-    tars = {2015: "12655151/files/tornet_2015.tar.gz", 2016: "12655179/files/tornet_2016.tar.gz",
-            2019: "12655716/files/tornet_2019.tar.gz"}
+    tars = {
+        2015: "12655151/files/tornet_2015.tar.gz",
+        2016: "12655179/files/tornet_2016.tar.gz",
+        2019: "12655716/files/tornet_2019.tar.gz",
+    }
     for s in SPLITS:
         n = len(ids[s])
         np.lib.format.open_memmap(out / f"{s}_x.npy", "w+", np.float16, (n, N_STORED, A, R)).flush()
@@ -113,8 +125,10 @@ def main() -> int:
         np.lib.format.open_memmap(out / f"{s}_qc.npy", "w+", np.float32, (n, 4)).flush()
         print(s, n, flush=True)
     q: mp.Queue = mp.Queue()
-    procs = [mp.Process(target=_worker, args=(y, str(raw / "tornet_2019_2015_2016" / t), str(out), ids, q))
-             for y, t in tars.items()]
+    procs = [
+        mp.Process(target=_worker, args=(y, str(raw / "tornet_2019_2015_2016" / t), str(out), ids, q))
+        for y, t in tars.items()
+    ]
     for p in procs:
         p.start()
     res = [q.get() for _ in procs]

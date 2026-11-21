@@ -207,6 +207,8 @@ def cmd_prep(args: argparse.Namespace) -> int:
 
 def cmd_train(args: argparse.Namespace) -> int:
     """Train one hazard model (storm only for now; delegates to ``outrun.hazards.storm.model.train_storm``)."""
+    if args.hazard == "tornado":
+        return _train_tornado(args)
     if args.hazard != "storm":
         raise NotImplementedError(f"training for {args.hazard!r} arrives with its own hazard task (T9+)")
 
@@ -238,6 +240,31 @@ def cmd_train(args: argparse.Namespace) -> int:
         val_ds,
         out_dir,
         use_ir=use_ir,
+        batch_size=args.batch_size,
+        device=device,
+        resume=args.resume,
+        max_epochs=args.epochs if args.epochs is not None else 20,
+        patience=args.patience,
+        seed=0 if args.seed is None else args.seed,
+    )
+    print(
+        f"done: best epoch {result.best_epoch} val {result.best_val_loss:.5f}, "
+        f"{result.epochs_run} epochs, stopped_early={result.stopped_early}, best={result.best_checkpoint}",
+        flush=True,
+    )
+    return 0
+
+
+def _train_tornado(args: argparse.Namespace) -> int:
+    """Tornado CNN on the processed TorNet train/val arrays (``hazards.tornado.train``); test is never read."""
+    from outrun.config import get_paths
+    from outrun.hazards.base import select_device
+    from outrun.hazards.tornado.train import train_tornado
+
+    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / "tornado"
+    device = str(select_device("cpu" if args.device == "cpu" else "mps"))
+    _, result = train_tornado(
+        out_dir,
         batch_size=args.batch_size,
         device=device,
         resume=args.resume,
