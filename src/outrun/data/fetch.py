@@ -667,6 +667,10 @@ HTTP_INDEX_RULES: dict[str, dict] = {
         # One daily shapefile zip per month folder (Shapefile/YYYY/MM/hms_smokeYYYYMMDD.zip).
         "patterns": ("hms_smoke*.zip",),
     },
+    "hms_fire_points": {
+        # T20 replay: daily HMS fire-detection point shapefile zips of March 2025 (Shapefile/2025/03/hms_fireYYYYMMDD.zip).
+        "patterns": ("hms_fire202503*.zip",),
+    },
 }
 
 

@@ -1,0 +1,26 @@
+{
+  "id": "ok-fire-2025",
+  "title": "REPLAY: Oklahoma wildfires, 2025-03-14 (HMS detections, no model)",
+  "t0": "2025-03-14T20:00:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "wildfire"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: wildfire.hms_persistence_replay@2025-03-14 (baseline)",
+    "observed: wildfire.hms_fire_points (observed)",
+    "REPLAY of observed NOAA HMS fire-detection points (GOES-East FDC, VIIRS NOAA-20/21, S-NPP), 2025-03-14; not a model forecast and not model-validated",
+    "model layer = persistence of the detections in the 3 h before t0 (20:00 UTC) with a 1-cell uncertainty ring; observed = detections after t0",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15
+}

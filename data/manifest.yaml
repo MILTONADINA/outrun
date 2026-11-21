@@ -143,6 +143,23 @@ sources:
     license: Public domain (NOAA)
     target: hdd
     sha256: TBD
+  - id: hms_fire_points
+    desc: NOAA HMS daily fire-detection points, March 2025 (31 zips), for the labelled OK Mar 2025 replay (T20) (satellite input)
+    # Layout: Fire_Points/Shapefile/2025/03/hms_fireYYYYMMDD.zip. Fetchable: fetch.py HTTP_INDEX_RULES["hms_fire_points"].
+    url: https://satepsanone.nesdis.noaa.gov/pub/FIRE/web/HMS/Fire_Points/Shapefile/2025/03/
+    access: http
+    approx_bytes: 25000000   # [MEASURED Nov 21] 801,096 B for 2025-03-14; whole month estimated
+    license: Public domain (NOAA)
+    target: hdd
+    sha256: TBD
+  - id: osm_norcal
+    desc: Geofabrik norcal-latest.osm.pbf (Northern California; Greenville CA roads for the WSTS 2021 demo fire, T20)
+    url: https://download.geofabrik.de/north-america/us/california/norcal/norcal-latest.osm.pbf
+    access: http
+    approx_bytes: 656727976   # [MEASURED Nov 21] (norcal-261120.osm.pbf; changes daily)
+    license: ODbL 1.0
+    target: hdd
+    sha256: TBD
   - id: aqs_pm25_hourly
     desc: EPA AQS hourly_88101_{2022,2023,2024,2025}.zip (2025 posted [MEASURED Nov 17]; 2025 completeness [CANDIDATE])
     # Sizes: 2022 75836309, 2023 76998372, 2024 66347589, 2025 68558274 (all Last-Modified 2026-07-13).

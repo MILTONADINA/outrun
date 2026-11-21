@@ -1,0 +1,27 @@
+{
+  "id": "dixie-2021",
+  "title": "Dixie Fire, 2021-08-06 (WildfireSpreadTS 2021 demo)",
+  "t0": "2021-08-06T12:00:00+00:00",
+  "city": "Greenville / Plumas County, CA",
+  "bbox": [
+    -121.45,
+    39.9,
+    -120.7,
+    40.55
+  ],
+  "hazards": [
+    "wildfire"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: wildfire.unet@dixie (forecast)",
+    "baseline: wildfire.persistence (baseline)",
+    "observed: wildfire.viirs (observed)",
+    "WildfireSpreadTS 2021 (VIIRS 375 m + GRIDMET), mapped to the 12 NDWS channels at 1 km; held-out test year, demo render only (not scored)",
+    "model: calibrated fire U-Net day-1 probability grown hourly from the day-0 VIIRS mask (t0 = day 1 12:00 UTC)",
+    "OSM roads (Geofabrik norcal extract, Greenville CA graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15
+}

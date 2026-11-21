@@ -15,6 +15,7 @@ Rows tagged [CANDIDATE] are verified in T1/T3 (licence page checked, recorded in
 | NCEI Storm Events | Flood and ice labels, case-study verification | NOAA NCEI | Public domain (NOAA) |
 | SPC tornado tracks | Tornado observed truth | NOAA Storm Prediction Center | Public domain (NOAA) |
 | NWS forecast zones | Ice label zones | NOAA NWS | Public domain (NOAA) |
+| NOAA HMS fire points (Mar 2025 replay) | Wildfire replay: satellite fire detections | NOAA OSPO | Public domain (NOAA) |
 | NOAA HMS smoke polygons | Smoke-model satellite input | NOAA OSPO | Public domain (NOAA) |
 | EPA AQS hourly PM2.5 (88101) | Smoke labels and observations | EPA AirData | Public domain (US EPA) |
 | ETOPO 2022 30" | Flood training terrain statics | NOAA NCEI | Public domain (NOAA) |

@@ -4,6 +4,9 @@ The 375 m WSTS bands are mapped to the 12 NDWS channels at 1 km (``outrun.data.w
 the NDWS-train statistics saved next to the checkpoint, and regridded (nearest cell) onto the scenario's GRID window.
 Population is not in WSTS, so that channel is NaN (-> 0 after normalisation, the NDWS-train mean).
 
+Replay (T20): ``hms_replay_layers`` turns NOAA HMS fire-detection points (observed satellite detections, no model) into
+a persistence layer and an observed layer for the labelled OK March 2025 scenario.
+
 Demo fire (T13): ``DEMO`` below, picked from the 2021 catalog (``wsts_shift catalog``) by size alone.
 """
 
@@ -19,11 +22,12 @@ from pathlib import Path
 import numpy as np
 
 from outrun.config import get_paths
-from outrun.core.grid import regrid_nearest
+from outrun.core.grid import lonlat_to_xy, regrid_nearest
+from outrun.core.risk import RiskLayer
 from outrun.core.scenario import Scenario
 from outrun.data.wsts import map_to_ndws, read_wsts_day
 
-from .adapter import WildfireInputs
+from .adapter import N_SLOTS, WildfireInputs, to_risk_layer
 from .dataset import NDWS_CHANNELS, NormStats, check_channel_order, normalize
 from .train import load_stats
 
@@ -116,3 +120,78 @@ def wsts_provider(
 def real_provider() -> Callable[[Scenario], WildfireInputs]:
     """The default provider (``WildfireAdapter(provider=None)``): the demo fire on the raw WSTS archive."""
     return wsts_provider()
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# OK March 2025 replay: HMS fire points (satellite detections), no weather model behind it.
+REPLAY_SOURCE = "wildfire.hms_persistence_replay"
+
+
+def read_hms_fire_points(days: list[date], raw: Path | None = None):
+    """Rows (lon, lat, utc time) of the HMS fire-point shapefiles of ``days`` (``hms_fireYYYYMMDD.zip``).
+
+    ``Time`` is the UTC HHMM of the detection (GOES FDC, VIIRS, ...); returns a pandas DataFrame with columns
+    ``lon``, ``lat`` and ``t`` (tz-aware UTC).
+    """
+    import geopandas as gpd
+    import pandas as pd
+
+    raw = raw or get_paths().raw / "hms_fire_points"
+    frames = []
+    for d in days:
+        path = next(raw.rglob(f"hms_fire{d:%Y%m%d}.zip"), None)
+        if path is None:
+            raise FileNotFoundError(
+                f"no hms_fire{d:%Y%m%d}.zip under {raw}; run `outrun fetch --source hms_fire_points`"
+            )
+        g = gpd.read_file(f"zip://{path}")
+        hhmm = g["Time"].astype(str).str.zfill(4)
+        t = pd.to_datetime(f"{d:%Y-%m-%d} " + hhmm.str[:2] + ":" + hhmm.str[2:], utc=True)
+        frames.append(pd.DataFrame({"lon": g["Lon"].astype(float), "lat": g["Lat"].astype(float), "t": t}))
+    return pd.concat(frames, ignore_index=True)
+
+
+def _rasterise(points, scn: Scenario, t_from: datetime, t_to: datetime) -> np.ndarray:
+    """(ny, nx) float32 1.0 in cells with a detection in ``(t_from, t_to]``."""
+    win = scn.grid_window()
+    out = np.zeros(win.shape, np.float32)
+    sel = points[(points["t"] > t_from) & (points["t"] <= t_to)]
+    if len(sel):
+        x, y = lonlat_to_xy(sel["lon"].to_numpy(), sel["lat"].to_numpy())
+        row, col = win.cell_of(x, y)
+        ok = row >= 0
+        out[row[ok], col[ok]] = 1.0
+    return out
+
+
+def hms_replay_layers(
+    scn: Scenario, points, lookback_h: float = 3.0, ring_p: float = 0.4, slot_minutes: int = 15
+) -> dict[str, RiskLayer]:
+    """Persistence + observed RiskLayers from HMS detections, causal at ``scn.t0``.
+
+    ``model``: detections of the last ``lookback_h`` hours before t0 (nothing after t0), P = 1 in a detected cell and
+    ``ring_p`` in its 8 neighbours (the 1 km cell is smaller than a GOES pixel, so the neighbours are uncertain),
+    held constant over the 12 slots (kind "baseline": this is persistence, not a forecast model).
+    ``observed``: slot s holds every detection in ``(t0, t0 + (s + 1) * slot_minutes]``, P = 1 (what really happened).
+    """
+    t0 = scn.t0
+    past = _rasterise(points, scn, t0 - timedelta(hours=lookback_h), t0)
+    ring = np.zeros_like(past)
+    for dr in (-1, 0, 1):
+        for dc in (-1, 0, 1):
+            ring = np.maximum(ring, np.roll(np.roll(past, dr, axis=0), dc, axis=1))
+    persist = np.where(past > 0, 1.0, ring_p * ring).astype(np.float32)
+    seen = np.stack(
+        [_rasterise(points, scn, t0, t0 + timedelta(minutes=slot_minutes * (s + 1))) for s in range(N_SLOTS)]
+    )
+    win = scn.grid_window()
+    kw = {"issued": t0, "held_out": True, "x": win.x_centers(), "y": win.y_centers()}
+    return {
+        "model": to_risk_layer(
+            np.repeat(persist[None], N_SLOTS, 0),
+            kind="baseline",
+            source=f"{REPLAY_SOURCE}@{t0:%Y-%m-%d}",
+            **kw,
+        ),  # fmt: skip
+        "observed": to_risk_layer(seen, kind="observed", source="wildfire.hms_fire_points", **kw),
+    }
