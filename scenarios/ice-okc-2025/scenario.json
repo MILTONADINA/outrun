@@ -1,0 +1,30 @@
+{
+  "id": "ice-okc-2025",
+  "title": "Ice storm, Oklahoma City metro, 2025-02-18 (test winter, demo render)",
+  "t0": "2025-02-18T15:00:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "ice"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: ice.milcnn@2025-02-18 (forecast)",
+    "baseline: ice.rule (baseline)",
+    "observed: ice.stormevents (observed)",
+    "HRRR f01 surface fields (t and t-3 h) + ETOPO elevation, 3 km; NWS forecast zones touching the OKC box",
+    "model: ice MIL-CNN calibrated on val; baseline: physics rule (freezing precipitation at T<=0 C); observed: labelled Storm Events zones",
+    "official TEST winter (2024-25): demo render only, no metric computed; cycle = the 3-hourly HRRR cycle of 2025-02-17..19 with the highest forecast probability (chosen from the model output, not from labels)",
+    "bridge prior (x1.5) applied to bridge edges",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15,
+  "graph": "okc"
+}

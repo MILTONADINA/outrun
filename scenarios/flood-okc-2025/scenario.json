@@ -1,0 +1,30 @@
+{
+  "id": "flood-okc-2025",
+  "title": "Flash flood, Oklahoma City metro, 2025-07-12 (test year, demo render)",
+  "t0": "2025-07-12T21:00:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "flood"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: flood.unet@2025-07-12 (forecast)",
+    "baseline: flood.ffg_ratio_rule (baseline)",
+    "observed: flood.stormevents (observed)",
+    "MRMS QPE (Pass2) 1 h/3 h/6 h/24 h accumulations + FLASH FFG/ARI ratios on the 0.01 degree grid, ETOPO terrain; U-Net features as in training",
+    "model: calibrated flash-flood U-Net; baseline: FFG-ratio rule; observed: NWS Storm Events flash-flood reports (5 km discs)",
+    "official TEST year (2025): demo render only, no metric computed; issue hour = hour of peak window-mean 1 h QPE",
+    "low-water crossings and bridges from the OKC OSM graph carry per-edge flood overrides",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15,
+  "graph": "okc"
+}

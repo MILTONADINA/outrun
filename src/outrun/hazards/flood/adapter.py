@@ -154,7 +154,11 @@ class FloodAdapter:
             if self.calibrator is None and cal.exists():
                 from outrun.core.calibrate import IsotonicCalibrator
 
-                self.calibrator = IsotonicCalibrator.from_dict(json.loads(cal.read_text()))
+                knots = json.loads(cal.read_text())  # {"type": "isotonic", "x": [...], "y": [...]} (CAL-06)
+                iso = IsotonicCalibrator()
+                iso.x_knots = np.asarray(knots["x"], dtype=np.float64)
+                iso.y_knots = np.asarray(knots["y"], dtype=np.float64)
+                self.calibrator = iso
         return self.model
 
     def _graph(self, scn: Scenario) -> RoadGraph | None:

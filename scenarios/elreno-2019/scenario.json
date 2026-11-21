@@ -22,9 +22,10 @@
     "baseline: tornado.delta_v_rule (baseline)",
     "observed: storm.observed_sevir (observed)",
     "SEVIR VIL (NEXRAD) 2 km, regridded to EPSG:5070 1 km",
-    "tornado: TorNet KTLX chips (ending <= t0+35 min, demo timing slack), swath along storm-provider motion (fallback HRRR/default)",
+    "tornado: TorNet chips from NEXRAD sites within the box (ending <= t0+35 min, demo timing slack), swath along storm-provider motion",
     "OSM roads (cached OKC graph)"
   ],
   "n_slots": 12,
-  "slot_minutes": 15
+  "slot_minutes": 15,
+  "graph": "okc"
 }

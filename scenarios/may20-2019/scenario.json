@@ -1,0 +1,31 @@
+{
+  "id": "may20-2019",
+  "title": "Oklahoma tornado outbreak, 2019-05-20 (SEVIR S830835, primary case)",
+  "t0": "2019-05-20T20:30:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "storm",
+    "tornado"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: storm.unet_vil_ir@S830835 (forecast)",
+    "model: tornado.cnn@may20 (forecast)",
+    "baseline: storm.pysteps_extrapolation@S830835 (baseline)",
+    "baseline: tornado.delta_v_rule (baseline)",
+    "observed: storm.observed_sevir (observed)",
+    "SEVIR VIL (NEXRAD) 2 km, regridded to EPSG:5070 1 km",
+    "tornado: TorNet chips from NEXRAD sites within the box (ending <= t0+35 min, demo timing slack), swath along storm-provider motion",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15,
+  "graph": "okc"
+}

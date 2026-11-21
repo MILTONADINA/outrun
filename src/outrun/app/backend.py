@@ -123,6 +123,32 @@ class DefaultBackend:
         self._hardened: dict[str, list[int]] = {}  # scenario -> hospital/school graph nodes (PLAN-04)
         self._models: dict[tuple, Any] = {}  # built CostModels, so a second click skips the ~1 s table build
 
+    # ---- bundle files that make a clean clone self-contained (T22): shared city graph and facility table
+    def graph_path(self, scenario_id: str) -> Path:
+        """``<id>/graph.npz`` if present, else the shared ``_graphs/<scenario.json "graph">.npz`` of the bundle."""
+        folder = self.scenarios_dir / scenario_id
+        own = folder / "graph.npz"
+        if own.exists():
+            return own
+        name = json.loads((folder / "scenario.json").read_text()).get("graph")
+        if not name:
+            return own  # load_npz reports the missing file
+        return self.scenarios_dir / "_graphs" / f"{name}.npz"
+
+    def _facilities(self, scenario_id: str, bbox: tuple[float, float, float, float]) -> dict[str, Any] | None:
+        """``{kind: (n, 2) lon/lat}`` from the bundle's ``_graphs/<graph>.facilities.json`` inside ``bbox``, or ``None``
+        if the bundle ships none (then the HIFLD files under RAW are used)."""
+        import numpy as np
+
+        name = json.loads((self.scenarios_dir / scenario_id / "scenario.json").read_text()).get("graph")
+        path = self.scenarios_dir / "_graphs" / f"{name}.facilities.json" if name else None
+        if path is None or not path.is_file():
+            return None
+        d = json.loads(path.read_text())
+        lon, lat, kind = np.asarray(d["lon"], float), np.asarray(d["lat"], float), np.asarray(d["kind"])
+        inside = (lon >= bbox[0]) & (lon <= bbox[2]) & (lat >= bbox[1]) & (lat <= bbox[3])
+        return {k: np.c_[lon[inside & (kind == k)], lat[inside & (kind == k)]] for k in sorted(set(kind.tolist()))}
+
     # ---- loading (cached per scenario so a click does not reload the graph)
     def _load(self, scenario_id: str, stack_name: str) -> tuple[Any, Any, Any, Any]:
         """(graph, stack, edge_risk, node_risk) for ``risk<stack_name>.zarr`` of a scenario."""
@@ -133,7 +159,7 @@ class DefaultBackend:
             from outrun.routing.cost import EdgeRiskSampler
 
             folder = self.scenarios_dir / scenario_id
-            graph = load_npz(folder / "graph.npz")
+            graph = load_npz(self.graph_path(scenario_id))
             stack = RiskStack.from_zarr(folder / f"risk{stack_name}.zarr")
             sampler = EdgeRiskSampler.from_window(graph, stack.window)
             self._loaded[key] = (graph, stack, sampler.sample_stack(stack), sampler.sample_stack_nodes(stack))
@@ -183,14 +209,19 @@ class DefaultBackend:
 
         if scenario_id not in self._hardened:
             try:
-                from outrun.config import get_paths
-                from outrun.data.facilities import load_hifld_facilities
                 from outrun.routing.okc_ems import snap_nodes
 
                 bbox = tuple(json.loads((self.scenarios_dir / scenario_id / "scenario.json").read_text())["bbox"])
-                df = load_hifld_facilities(get_paths().raw, bbox)
-                df = df[df["kind"].isin(["hospital", "school"])]
-                nodes = snap_nodes(graph, df[["lon", "lat"]].to_numpy(dtype=float)) if len(df) else np.array([], int)
+                bundled = self._facilities(scenario_id, bbox)
+                if bundled is not None:
+                    pts = np.vstack([bundled.get(k, np.zeros((0, 2))) for k in ("hospital", "school")])
+                else:
+                    from outrun.config import get_paths
+                    from outrun.data.facilities import load_hifld_facilities
+
+                    df = load_hifld_facilities(get_paths().raw, bbox)
+                    pts = df[df["kind"].isin(["hospital", "school"])][["lon", "lat"]].to_numpy(dtype=float)
+                nodes = snap_nodes(graph, pts) if len(pts) else np.array([], int)
                 self._hardened[scenario_id] = sorted({int(n) for n in nodes})
             except (OSError, LookupError, KeyError):  # no facility files: the rule falls back to plain shelter-in-place
                 self._hardened[scenario_id] = []
@@ -251,7 +282,13 @@ class DefaultBackend:
         folder = self.scenarios_dir / req.scenario
         graph, stack, edge_risk, node_risk = self._load(req.scenario, "")
         bbox = tuple(json.loads((folder / "scenario.json").read_text())["bbox"])
-        stations, hospitals = load_facility_points(bbox)
+        bundled = self._facilities(req.scenario, bbox)
+        if bundled is not None:
+            stations, hospitals = bundled.get("fire_station", np.zeros((0, 2))), bundled.get("hospital", np.zeros((0, 2)))
+            if not len(stations):
+                raise LookupError("no fire/EMS stations in the scenario bbox")
+        else:
+            stations, hospitals = load_facility_points(bbox)
         t0_s = 0.0 if req.t0 is None else max(0.0, (req.t0 - stack.t0).total_seconds())
         model = self._cost_model((req.scenario, "", "ev", 1.0), graph, edge_risk, node_risk, Profile.EV, 1.0)
         return plan_dispatch(graph, model, stations, hospitals, np.asarray(req.incidents, dtype=float), t0_s)

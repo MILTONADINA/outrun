@@ -1,0 +1,7 @@
+{
+  "attributes": {
+    "outrun": "{\"t0\": \"2025-02-18T15:00:00+00:00\", \"window\": {\"x0\": -192000.0, \"y0\": 1421000.0, \"nx\": 96, \"ny\": 85, \"res\": 1000.0, \"crs\": \"EPSG:5070\"}, \"meta\": {\"ice\": {\"kind\": \"observed\", \"source\": \"ice.stormevents\", \"issued\": \"2025-02-18T15:00:00+00:00\", \"valid_until\": \"2025-02-18T18:00:00+00:00\", \"held_out\": true}}, \"edge_hazards\": []}"
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

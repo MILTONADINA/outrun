@@ -1,0 +1,7 @@
+{
+  "attributes": {
+    "outrun": "{\"t0\": \"2024-04-05T06:00:00+00:00\", \"window\": {\"x0\": -192000.0, \"y0\": 1421000.0, \"nx\": 96, \"ny\": 85, \"res\": 1000.0, \"crs\": \"EPSG:5070\"}, \"meta\": {\"smoke\": {\"kind\": \"observed\", \"source\": \"smoke.aqs.idw\", \"issued\": \"2024-04-05T06:00:00+00:00\", \"valid_until\": \"2024-04-05T12:00:00+00:00\", \"held_out\": true}}, \"edge_hazards\": []}"
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

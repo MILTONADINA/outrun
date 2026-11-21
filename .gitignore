@@ -1,9 +1,9 @@
-# Data, models and logs are never committed (data/manifest.yaml is the exception)
+# Data, models and logs are never committed (data/manifest.yaml is the exception).
+# scenarios/ bundles (risk zarr stacks, shared graphs) ARE committed so a clean clone runs the offline demo.
 data/*
 !data/manifest.yaml
 models/
 logs/
-scenarios/**/*.zarr
 *.mp4
 
 # Python / tooling
@@ -24,4 +24,3 @@ htmlcov/
 .vscode/
 .claude/settings.local.json
 cache/
-scenarios/**/graph.npz

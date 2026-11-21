@@ -1,0 +1,29 @@
+{
+  "id": "smoke-okc-2024",
+  "title": "Smoke, Oklahoma City metro, 2024-04-05 (test year, demo render)",
+  "t0": "2024-04-05T06:00:00+00:00",
+  "city": "Oklahoma City, OK",
+  "bbox": [
+    -98.1,
+    35.1,
+    -97.1,
+    35.8
+  ],
+  "hazards": [
+    "smoke"
+  ],
+  "held_out": true,
+  "synthetic": false,
+  "sources": [
+    "model: smoke.cnnmlp@2024-04-05 (forecast)",
+    "baseline: smoke.hrrr.calibrated (baseline)",
+    "observed: smoke.aqs.idw (observed)",
+    "HRRR-Smoke near-surface mass density (9 km store) + EPA AQS PM2.5 monitors + NOAA HMS smoke polygons",
+    "model: CNN+MLP PM2.5 median; baseline: calibrated raw HRRR-Smoke; observed: AQS monitors, inverse-distance weighted, at t0 + 6 h",
+    "official TEST year (2024): demo render only, no metric computed; top Oklahoma AQS day 2024-04-05; cycle = the 6-hourly cycle of 04-04..06 with the highest forecast PM2.5 (20.7 ug/m3), which stays below the 35.4 ug/m3 risk threshold, so the model and baseline risk layers are empty over OKC (honest result, thresholds not changed)",
+    "OSM roads (cached OKC graph)"
+  ],
+  "n_slots": 12,
+  "slot_minutes": 15,
+  "graph": "okc"
+}

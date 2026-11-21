@@ -66,7 +66,10 @@ def build_evac(
 
     t_start = time.perf_counter()
     scenario_dir = Path(scenario_dir)
-    graph = load_npz(scenario_dir / "graph.npz")
+    own = scenario_dir / "graph.npz"  # a bundle uses its own graph or the shared scenarios/_graphs/<name>.npz
+    if not own.exists():
+        own = scenario_dir.parent / "_graphs" / f"{json.loads((scenario_dir / 'scenario.json').read_text())['graph']}.npz"
+    graph = load_npz(own)
     stack = RiskStack.from_zarr(scenario_dir / "risk.zarr")
     cm = build_cost_model(graph, stack, Profile(profile))
     log(f"cost model: {cm.n_edges} edges, {cm.n_slots} slots ({time.perf_counter() - t_start:.0f}s)")

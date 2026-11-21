@@ -398,8 +398,22 @@ def cmd_eval(args: argparse.Namespace) -> int:
 
 
 def cmd_scenario(args: argparse.Namespace) -> int:
-    """Precompute scenario bundles (layout in specs/14-app.md) into ``args.out``."""
-    raise NotImplementedError("scenario bundles arrive with the app tasks")
+    """Precompute scenario bundles (layout in specs/14-app.md) into ``args.out``: one id, or ``--all``; no id lists them."""
+    from outrun.app import build
+
+    if args.all:
+        ids = list(build.SPECS)
+    elif args.scenario_id is None:
+        print("scenarios: " + ", ".join(build.SPECS) + "  (outrun scenario ID | --all [--out DIR])")
+        return 0
+    elif args.scenario_id in build.SPECS:
+        ids = [args.scenario_id]
+    else:
+        print(f"unknown scenario {args.scenario_id!r}; choose from {', '.join(build.SPECS)}", file=sys.stderr)
+        return 2
+    for sid in ids:
+        build.build_scenario(Path(args.out), sid)
+    return 0
 
 
 def cmd_route(args: argparse.Namespace) -> int:

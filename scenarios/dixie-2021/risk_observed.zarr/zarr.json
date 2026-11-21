@@ -1,0 +1,7 @@
+{
+  "attributes": {
+    "outrun": "{\"t0\": \"2021-08-06T12:00:00+00:00\", \"window\": {\"x0\": -2133000.0, \"y0\": 2236000.0, \"nx\": 85, \"ny\": 92, \"res\": 1000.0, \"crs\": \"EPSG:5070\"}, \"meta\": {\"wildfire\": {\"kind\": \"observed\", \"source\": \"wildfire.viirs\", \"issued\": \"2021-08-06T12:00:00+00:00\", \"valid_until\": \"2021-08-07T12:00:00+00:00\", \"held_out\": true}}, \"edge_hazards\": []}"
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}

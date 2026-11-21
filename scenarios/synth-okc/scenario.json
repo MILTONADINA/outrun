@@ -15,9 +15,12 @@
   "held_out": false,
   "synthetic": true,
   "sources": [
-    "synthetic moving Gaussian storm",
+    "model: synthetic.model",
+    "baseline: synthetic.baseline",
+    "synthetic moving Gaussian storm (model), no hazard (baseline)",
     "OSM roads (cached OKC graph)"
   ],
   "n_slots": 12,
-  "slot_minutes": 15
+  "slot_minutes": 15,
+  "graph": "okc"
 }

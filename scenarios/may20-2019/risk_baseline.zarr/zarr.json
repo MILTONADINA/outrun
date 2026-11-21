@@ -1,0 +1,7 @@
+{
+  "attributes": {
+    "outrun": "{\"t0\": \"2019-05-20T20:30:00+00:00\", \"window\": {\"x0\": -192000.0, \"y0\": 1421000.0, \"nx\": 96, \"ny\": 85, \"res\": 1000.0, \"crs\": \"EPSG:5070\"}, \"meta\": {\"storm\": {\"kind\": \"baseline\", \"source\": \"storm.pysteps_extrapolation@S830835\", \"issued\": \"2019-05-20T20:30:00+00:00\", \"valid_until\": \"2019-05-20T21:30:00+00:00\", \"held_out\": true}, \"tornado\": {\"kind\": \"baseline\", \"source\": \"tornado.delta_v_rule\", \"issued\": \"2019-05-20T20:30:00+00:00\", \"valid_until\": \"2019-05-20T21:00:00+00:00\", \"held_out\": true}}, \"edge_hazards\": []}"
+  },
+  "zarr_format": 3,
+  "node_type": "group"
+}
