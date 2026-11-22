@@ -20,10 +20,11 @@ interactive map app that also runs fully offline.
 ## Quickstart
 
 ```bash
-make install        # Python 3.12 venv + pip install -e ".[dev]"
+make install        # Python 3.12 venv + pip install -e ".[dev]"  (override with PYTHON=/path/to/python3.12)
 make test           # unit tests (synthetic data only, offline, no models or data needed)
-make demo           # offline map app on the precomputed scenarios/ bundles
-make e2e            # Playwright offline-demo test (python -m playwright install chromium once)
+make demo           # offline map app at http://localhost:8000 (port 8000 must be free)
+.venv/bin/python -m playwright install chromium   # once, before make e2e
+make e2e            # Playwright offline-demo test
 ```
 
 `scenarios/` is committed, so a clean clone runs the demo with no data, models or network. Live recomputation
@@ -31,7 +32,7 @@ make e2e            # Playwright offline-demo test (python -m playwright install
 
 ![Outrun demo: forecast, safe route, shelters, evacuation, metrics](docs/demo.gif)
 
-The GIF is captured from `outrun serve --demo` (`scripts/make_demo_gif.py`). The narrated video script is `DEMO.md`; the MP4 link is added here when the `v1.0-rc` release exists.
+The GIF is captured from `make demo` (`scripts/make_demo_gif.py`). The narrated video script is `DEMO.md`; the MP4 link is added here when the `v1.0-rc` release exists.
 
 ### Static demo (GitHub Pages)
 

@@ -33,7 +33,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T26 (Dec 2) REPORT.md (5 rubric sections) + PDF
 - [x] T27 (Dec 3) Slides (PPTX + PDF)
 - [x] T28 (Dec 3) DEMO.md, rehearsals, narrated backup video, v1.0-rc
-- [ ] T29 (Dec 4 a.m.) Clean-clone offline dry run, tag v1.0, submit before 1:40 pm
+- [x] T29 (Dec 4 a.m.) Clean-clone offline dry run, tag v1.0, submit before 1:40 pm
 
 Starting state after T0: `.venv/bin/python -m pytest` -> traceability checks run; everything else fails with
 `NotImplementedError` (tests are written before code).

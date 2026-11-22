@@ -1,9 +1,10 @@
 PY := .venv/bin/python
+PYTHON ?= python3.12
 
 .PHONY: install test test-fast acceptance e2e fetch serve demo lint
 
 install:
-	/opt/homebrew/bin/python3.12 -m venv .venv
+	$(PYTHON) -m venv .venv
 	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -e ".[dev]"
 
