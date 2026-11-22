@@ -20,7 +20,7 @@ vanilla MapLibre front end that runs fully offline from committed scenario bundl
 
 **Satellite inputs, named explicitly.**
 - GOES-16 IR 10.7 um channel (IR107) from SEVIR, stacked with radar VIL as extra input channels of the storm U-Net.
-- MODIS fire masks and VIIRS NDVI/bands inside the NDWS (Next Day Wildfire Spread) and WSTS datasets for the wildfire
+- MODIS fire masks and VIIRS NDVI/bands inside the NDWS (Next Day Wildfire Spread) and WildfireSpreadTS (WSTS) datasets for the wildfire
   model; WSTS 2021 is used as an out-of-time test.
 - NOAA HMS (Hazard Mapping System) satellite smoke polygons as an input to the smoke model.
 
