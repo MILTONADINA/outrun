@@ -24,3 +24,6 @@ htmlcov/
 .vscode/
 .claude/settings.local.json
 cache/
+
+# Static export output (built by CI)
+_site/

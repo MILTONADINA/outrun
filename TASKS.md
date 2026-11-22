@@ -29,7 +29,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T22 (Nov 29) Scenario bundles for all scenarios; [overnight] build
 - [x] T23 (Nov 30) App: all tabs, offline Playwright test
 - [x] T24 (Dec 1) One-shot test evaluation, routing eval, acceptance (feature freeze)
-- [ ] T25 (Dec 2) README, model cards, DATA_LICENSES, static Pages export, CI polish
+- [x] T25 (Dec 2) README, model cards, DATA_LICENSES, static Pages export, CI polish
 - [ ] T26 (Dec 2) REPORT.md (5 rubric sections) + PDF
 - [ ] T27 (Dec 3) Slides (PPTX + PDF)
 - [ ] T28 (Dec 3) DEMO.md, rehearsals, narrated backup video, v1.0-rc

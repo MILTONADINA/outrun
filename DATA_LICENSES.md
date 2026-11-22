@@ -2,7 +2,20 @@
 
 Code in this repository is MIT-licensed (`LICENSE`). **No data is committed.** Every dataset is downloaded by
 `outrun fetch` from the source listed in `data/manifest.yaml` and keeps its own licence below.
-Rows tagged [CANDIDATE] are verified in T1/T3 (licence page checked, recorded in NOTES.md).
+Rows tagged [CANDIDATE] could not be fully confirmed from a licence page and rest on the registry or mirror terms
+named in the row; re-check before any redistribution. Trained model weights are not committed (`models/` is
+ignored); they are derived from the datasets above and carry the attribution duties below.
+
+**Redistributed in this repo:** `scenarios/` holds derived bundles (risk rasters, overlays, route results) and
+shared road graphs built from OpenStreetMap (ODbL 1.0: (c) OpenStreetMap contributors; the graphs are a derived
+database and stay under ODbL) plus HIFLD facility lists (public domain, via the source.coop mirror). The static
+Pages export copies only overlays and result JSON from `scenarios/`, plus `reports/` metrics.
+
+**Not committed:** raw SEVIR, TorNet, NDWS, WSTS, MRMS, HRRR, AQS and every other download. NDWS needs the user's own
+Kaggle API token in `~/.kaggle/kaggle.json`; the token is never stored in this repo.
+
+**Attribution:** SEVIR (Veillette et al., NeurIPS 2020), TorNet (Veillette et al., MIT Lincoln Laboratory),
+Next Day Wildfire Spread (Huot et al., 2022), WildfireSpreadTS (Gerard et al., 2023). Licences per the table.
 
 | Dataset | Used for | Source | Licence |
 |---|---|---|---|
