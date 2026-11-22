@@ -31,7 +31,7 @@ tests green -> NOTES.md row -> tick the box -> commit `T<n>: ...`. Full rules in
 - [x] T24 (Dec 1) One-shot test evaluation, routing eval, acceptance (feature freeze)
 - [x] T25 (Dec 2) README, model cards, DATA_LICENSES, static Pages export, CI polish
 - [x] T26 (Dec 2) REPORT.md (5 rubric sections) + PDF
-- [ ] T27 (Dec 3) Slides (PPTX + PDF)
+- [x] T27 (Dec 3) Slides (PPTX + PDF)
 - [ ] T28 (Dec 3) DEMO.md, rehearsals, narrated backup video, v1.0-rc
 - [ ] T29 (Dec 4 a.m.) Clean-clone offline dry run, tag v1.0, submit before 1:40 pm
 
