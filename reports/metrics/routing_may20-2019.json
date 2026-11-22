@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "scenario": "may20-2019",
+  "primary": true,
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-22T10:53:12Z",
+  "n_origins": 500,
+  "n_paired": 500,
+  "planners": {
+    "a": {
+      "n_routed": 500,
+      "n_failed": 0,
+      "pct_intersect": 94.0,
+      "mean_exposure_risk_min": 5.902641266742609,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "a_prime": {
+      "n_routed": 500,
+      "n_failed": 0,
+      "pct_intersect": 93.2,
+      "mean_exposure_risk_min": 5.688579449722423,
+      "mean_travel_time_ratio": 1.002251483185681,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 5.235593728781129
+    },
+    "b": {
+      "n_routed": 500,
+      "n_failed": 0,
+      "pct_intersect": 93.8,
+      "mean_exposure_risk_min": 5.96923836165056,
+      "mean_travel_time_ratio": 1.037050652140127,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 4.853378608625697
+    },
+    "c": {
+      "n_routed": 500,
+      "n_failed": 0,
+      "pct_intersect": 93.2,
+      "mean_exposure_risk_min": 5.680956664933343,
+      "mean_travel_time_ratio": 1.0013695360373407,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 5.242428182716767
+    },
+    "d": {
+      "n_routed": 500,
+      "n_failed": 0,
+      "pct_intersect": 91.0,
+      "mean_exposure_risk_min": 5.348966954042755,
+      "mean_travel_time_ratio": 1.0072260336703793,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 5.3697986189463975
+    }
+  },
+  "gap_closed": {
+    "estimate": 0.40038809228529426,
+    "low": 0.17635711511203045,
+    "high": 0.5611412093297079,
+    "n_resamples": 1000,
+    "n_blocks": 500
+  },
+  "c_minus_b": {
+    "estimate": -0.28828169671721693,
+    "low": -0.446973484656495,
+    "high": -0.13697114654555556,
+    "n_resamples": 1000,
+    "n_blocks": 500
+  },
+  "c_minus_a_prime": {
+    "estimate": -0.00762278478907927,
+    "low": -0.022868354367237814,
+    "high": 0.0,
+    "n_resamples": 1000,
+    "n_blocks": 500
+  }
+}

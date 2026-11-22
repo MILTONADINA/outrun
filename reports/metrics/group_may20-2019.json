@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "scenario": "may20-2019",
+  "primary": true,
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-22T11:03:09Z",
+  "shelters": {
+    "mcf": {
+      "served_persons": 19118,
+      "unserved_persons": 112461,
+      "total_person_minutes": 85949.63285878136,
+      "max_minutes": 28.470342398571198,
+      "overflow_persons": 0,
+      "overflow_pct": 0.0,
+      "mean_exposure": NaN,
+      "objective": 6148226415.0
+    },
+    "nearest": {
+      "served_persons": 131579,
+      "unserved_persons": 0,
+      "total_person_minutes": 652889.9737638314,
+      "max_minutes": 25.91721662386003,
+      "overflow_persons": 114983,
+      "overflow_pct": 87.38704504518198,
+      "mean_exposure": NaN,
+      "objective": 39172933.0
+    },
+    "greedy": {
+      "served_persons": 19118,
+      "unserved_persons": 112461,
+      "total_person_minutes": 332643.8062282974,
+      "max_minutes": 75.18368874275838,
+      "overflow_persons": 0,
+      "overflow_pct": 0.0,
+      "mean_exposure": NaN,
+      "objective": 6163029233.0
+    }
+  },
+  "evacuation": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "lower_bound": 2413.981466703233,
+    "methods": {
+      "shortest": [
+        {
+          "vehicle_hours": 9416.532932880527,
+          "exposure_veh_h": 3344.772618729506,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.66123321558,
+          "gap_to_lb_pct": 595.3931281063674
+        },
+        {
+          "vehicle_hours": 9416.532932880527,
+          "exposure_veh_h": 3344.772618729506,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.66123321558,
+          "gap_to_lb_pct": 595.3931281063674
+        },
+        {
+          "vehicle_hours": 9416.532932880527,
+          "exposure_veh_h": 3344.772618729506,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.66123321558,
+          "gap_to_lb_pct": 595.3931281063674
+        },
+        {
+          "vehicle_hours": 9416.532932880527,
+          "exposure_veh_h": 3344.772618729506,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.66123321558,
+          "gap_to_lb_pct": 595.3931281063674
+        },
+        {
+          "vehicle_hours": 9416.532932880527,
+          "exposure_veh_h": 3344.772618729506,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.66123321558,
+          "gap_to_lb_pct": 595.3931281063674
+        }
+      ],
+      "safest": [
+        {
+          "vehicle_hours": 9416.854248524312,
+          "exposure_veh_h": 3344.769583341822,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.97951347168,
+          "gap_to_lb_pct": 595.4063129737946
+        },
+        {
+          "vehicle_hours": 9416.854248524312,
+          "exposure_veh_h": 3344.769583341822,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.97951347168,
+          "gap_to_lb_pct": 595.4063129737946
+        },
+        {
+          "vehicle_hours": 9416.854248524312,
+          "exposure_veh_h": 3344.769583341822,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.97951347168,
+          "gap_to_lb_pct": 595.4063129737946
+        },
+        {
+          "vehicle_hours": 9416.854248524312,
+          "exposure_veh_h": 3344.769583341822,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.97951347168,
+          "gap_to_lb_pct": 595.4063129737946
+        },
+        {
+          "vehicle_hours": 9416.854248524312,
+          "exposure_veh_h": 3344.769583341822,
+          "clearance_min": 32.46865551264119,
+          "max_vc": 7.82,
+          "unserved_veh": 0.0,
+          "J": 16786.97951347168,
+          "gap_to_lb_pct": 595.4063129737946
+        }
+      ],
+      "msa": [
+        {
+          "vehicle_hours": 2962.0266070113353,
+          "exposure_veh_h": 814.0508566986866,
+          "clearance_min": 94.77186166535711,
+          "max_vc": 4.466666666666667,
+          "unserved_veh": 0.0,
+          "J": 15525.576966775445,
+          "gap_to_lb_pct": 543.1522851738657
+        },
+        {
+          "vehicle_hours": 2962.0266070113353,
+          "exposure_veh_h": 814.0508566986866,
+          "clearance_min": 94.77186166535711,
+          "max_vc": 4.466666666666667,
+          "unserved_veh": 0.0,
+          "J": 15525.576966775445,
+          "gap_to_lb_pct": 543.1522851738657
+        },
+        {
+          "vehicle_hours": 2962.0266070113353,
+          "exposure_veh_h": 814.0508566986866,
+          "clearance_min": 94.77186166535711,
+          "max_vc": 4.466666666666667,
+          "unserved_veh": 0.0,
+          "J": 15525.576966775445,
+          "gap_to_lb_pct": 543.1522851738657
+        },
+        {
+          "vehicle_hours": 2962.0266070113353,
+          "exposure_veh_h": 814.0508566986866,
+          "clearance_min": 94.77186166535711,
+          "max_vc": 4.466666666666667,
+          "unserved_veh": 0.0,
+          "J": 15525.576966775445,
+          "gap_to_lb_pct": 543.1522851738657
+        },
+        {
+          "vehicle_hours": 2962.0266070113353,
+          "exposure_veh_h": 814.0508566986866,
+          "clearance_min": 94.77186166535711,
+          "max_vc": 4.466666666666667,
+          "unserved_veh": 0.0,
+          "J": 15525.576966775445,
+          "gap_to_lb_pct": 543.1522851738657
+        }
+      ],
+      "sa": [
+        {
+          "vehicle_hours": 1876.0325516700575,
+          "exposure_veh_h": 2764.1191438807064,
+          "clearance_min": 33.392075817504775,
+          "max_vc": 3.16,
+          "unserved_veh": 0.0,
+          "J": 8779.989948485614,
+          "gap_to_lb_pct": 263.7140578579677
+        },
+        {
+          "vehicle_hours": 1906.618265559786,
+          "exposure_veh_h": 2770.6519442735735,
+          "clearance_min": 33.50085424301568,
+          "max_vc": 3.49,
+          "unserved_veh": 0.0,
+          "J": 8830.5944493683,
+          "gap_to_lb_pct": 265.810366449425
+        },
+        {
+          "vehicle_hours": 1931.5350990008217,
+          "exposure_veh_h": 2796.5259808944525,
+          "clearance_min": 33.28743441819255,
+          "max_vc": 3.546666666666667,
+          "unserved_veh": 0.0,
+          "J": 8854.926240948058,
+          "gap_to_lb_pct": 266.81831915806725
+        },
+        {
+          "vehicle_hours": 1866.4688152145072,
+          "exposure_veh_h": 2766.6930727368203,
+          "clearance_min": 33.24484059626656,
+          "max_vc": 2.91,
+          "unserved_veh": 0.0,
+          "J": 8754.746408941137,
+          "gap_to_lb_pct": 262.66833568103016
+        },
+        {
+          "vehicle_hours": 1878.3340293045999,
+          "exposure_veh_h": 2798.061255864207,
+          "clearance_min": 33.06670410708044,
+          "max_vc": 2.9833333333333334,
+          "unserved_veh": 0.0,
+          "J": 8775.895038017617,
+          "gap_to_lb_pct": 263.54442480467054
+        }
+      ],
+      "sa_lambda0": [
+        {
+          "vehicle_hours": 1826.2223582025442,
+          "exposure_veh_h": 2929.400805554919,
+          "clearance_min": 33.3778674757329,
+          "max_vc": 2.9133333333333336,
+          "unserved_veh": 0.0,
+          "J": 8893.699913840575,
+          "gap_to_lb_pct": 268.4245316923114
+        },
+        {
+          "vehicle_hours": 2850.8039621411244,
+          "exposure_veh_h": 3464.904272649252,
+          "clearance_min": 15.683048312631291,
+          "max_vc": 5.523333333333333,
+          "unserved_veh": 0.0,
+          "J": 8260.040287762695,
+          "gap_to_lb_pct": 242.17496702836772
+        },
+        {
+          "vehicle_hours": 1834.8060213876272,
+          "exposure_veh_h": 2967.1188879820843,
+          "clearance_min": 32.85597123800266,
+          "max_vc": 2.9433333333333334,
+          "unserved_veh": 0.0,
+          "J": 8875.298703553155,
+          "gap_to_lb_pct": 267.6622553227023
+        },
+        {
+          "vehicle_hours": 3020.9769635543726,
+          "exposure_veh_h": 3457.5779479760777,
+          "clearance_min": 20.38816438451522,
+          "max_vc": 5.1866666666666665,
+          "unserved_veh": 0.0,
+          "J": 9006.211571374699,
+          "gap_to_lb_pct": 273.08536521924725
+        },
+        {
+          "vehicle_hours": 1832.0982222901182,
+          "exposure_veh_h": 2956.3161145339755,
+          "clearance_min": 33.050501057514666,
+          "max_vc": 2.9166666666666665,
+          "unserved_veh": 0.0,
+          "J": 8885.905289597904,
+          "gap_to_lb_pct": 268.1016367426117
+        }
+      ]
+    }
+  },
+  "ems": {
+    "hungarian": {
+      "mean_eta_min": 4.148663995607735,
+      "mean_detour_min": 0.0,
+      "pct_hit_block": 0.0,
+      "pct_unreached": 0.0,
+      "mean_exposure": 124.06630318688082
+    },
+    "reroute_baseline": {
+      "mean_eta_min": 3.9683699648452735,
+      "mean_detour_min": 1.9737298215558336e-17,
+      "pct_hit_block": 0.0,
+      "pct_unreached": 0.0,
+      "mean_exposure": 118.8185856589526
+    },
+    "pareto": [
+      {
+        "lam": 0.0,
+        "eta_min": 8.894350555552563,
+        "exposure": 266.29894063721486
+      },
+      {
+        "lam": 0.25,
+        "eta_min": 8.894350555552563,
+        "exposure": 266.29894063721486
+      },
+      {
+        "lam": 0.5,
+        "eta_min": 8.894350555552563,
+        "exposure": 266.29894063721486
+      },
+      {
+        "lam": 1.0,
+        "eta_min": 8.894350555552563,
+        "exposure": 266.29894063721486
+      },
+      {
+        "lam": 2.0,
+        "eta_min": 8.894350555552563,
+        "exposure": 266.29894063721486
+      },
+      {
+        "lam": 0.0,
+        "eta_min": 4.351355782656728,
+        "exposure": 130.2754542747221
+      },
+      {
+        "lam": 0.25,
+        "eta_min": 4.351355782656728,
+        "exposure": 130.2754542747221
+      },
+      {
+        "lam": 0.5,
+        "eta_min": 4.351355782656728,
+        "exposure": 130.2754542747221
+      },
+      {
+        "lam": 1.0,
+        "eta_min": 4.351355782656728,
+        "exposure": 130.2754542747221
+      },
+      {
+        "lam": 2.0,
+        "eta_min": 4.351355782656728,
+        "exposure": 130.2754542747221
+      },
+      {
+        "lam": 0.0,
+        "eta_min": 4.712770881118489,
+        "exposure": 141.1659864505086
+      },
+      {
+        "lam": 0.25,
+        "eta_min": 4.712770881118489,
+        "exposure": 141.1659864505086
+      },
+      {
+        "lam": 0.5,
+        "eta_min": 4.712770881118489,
+        "exposure": 141.1659864505086
+      },
+      {
+        "lam": 1.0,
+        "eta_min": 4.712770881118489,
+        "exposure": 141.1659864505086
+      },
+      {
+        "lam": 2.0,
+        "eta_min": 4.712770881118489,
+        "exposure": 141.1659864505086
+      }
+    ],
+    "n_incidents": 36,
+    "slot": 0
+  }
+}

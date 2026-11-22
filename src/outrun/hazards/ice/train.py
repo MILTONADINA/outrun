@@ -41,11 +41,13 @@ class ZoneLogitNet(nn.Module):
 class BagStore:
     """HRRR crop in RAM + per-zone crop windows; ``batch(bags, rows)`` -> normalised (B, 20, 64, 64) float32."""
 
-    def __init__(self, bags_dir: Path) -> None:
+    def __init__(self, bags_dir: Path, times: np.ndarray | None = None) -> None:
+        """``times``: optional sorted unique time rows to keep (saves RAM); ``i_t``/``i_tm3`` must then be remapped."""
         import zarr
 
         root = zarr.open_group(get_paths().proc / "hrrr" / "ice" / "data.zarr", mode="r")
-        self.fields = np.stack([np.asarray(root[ARRAY[f]][:]) for f in ICE_FIELDS])  # (9, T, H, W) float16
+        keep = (lambda a: a) if times is None else (lambda a: a[times])
+        self.fields = np.stack([keep(np.asarray(root[ARRAY[f]][:])) for f in ICE_FIELDS])  # (9, T, H, W) float16
         zones = np.load(bags_dir / "zones.npz")
         h, w = (int(v) for v in zones["grid_shape"])
         elev = np.load(bags_dir / "elevation.npy").astype(np.float32)

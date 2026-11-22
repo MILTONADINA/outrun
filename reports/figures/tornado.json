@@ -1,0 +1,97 @@
+{
+ "notes": [
+  "CNN row = frozen isotonic calibrator; csi/pod/far at the val-frozen calibrated cut 0.1818 (operating_point.json, picked on val). Baselines use the spec cut 0.5 for csi/pod/far; 'tornado.cnn_raw' is the uncalibrated CNN (reported as a baseline-kind row for transparency only; it is not a separate model).",
+  "Primary auc_tor_vs_warned_null = ROC-AUC on TOR chips vs warned-null (WRN) chips only (TORN-07); day-block bootstrap over UTC calendar days of the chips (id days from splits/tornet.json); other metrics bootstrapped: auc, auprc, csi; pod/far/brier/ece/auc_range_* are point estimates (nan bounds).",
+  "Reference row: TorNet published AUC 0.874 is a different task/protocol (all chips, own test split), not directly comparable to the warned-null AUC; compare against 'auc' instead.",
+  "No tornado no-range checkpoint exists in models/, so the required-if-present ablation is omitted; tornado.range_only quantifies the range shortcut.",
+  "GBM and range-only logistic are fit on train only (87 all-missing train chips dropped, as in val_eval).",
+  "ECE of the calibrated CNN on val is ~0 because the isotonic map was fit on val (optimistic by design); on test it is a genuine out-of-sample calibration error.",
+  "Test chips from 2019-05-17..19 quarantine days are test-only by construction (SPLIT-08); case_holdout is limited to near-KTLX chips and is a small set (single-class AUC gives nan)."
+ ],
+ "figures": {
+  "reliability_test": {
+   "n_bins": 10,
+   "counts": [
+    8828,
+    912,
+    887,
+    36,
+    195,
+    1,
+    1,
+    1,
+    0,
+    23
+   ],
+   "mean_pred": [
+    0.031454820793792325,
+    0.15778893628466578,
+    0.23517410576424821,
+    0.36736535292466255,
+    0.4433151497255992,
+    0.5633744913405769,
+    0.6699788478887858,
+    0.7970057137346609,
+    -1.0,
+    1.0
+   ],
+   "obs_freq": [
+    0.022655188038060717,
+    0.1524122807017544,
+    0.27846674182638104,
+    0.5277777777777778,
+    0.6205128205128205,
+    1.0,
+    0.0,
+    1.0,
+    -1.0,
+    0.782608695652174
+   ]
+  },
+  "n_chips_test": 10884,
+  "n_tor_test": 746,
+  "n_blocks_test": 128,
+  "reliability_case_holdout": {
+   "n_bins": 10,
+   "counts": [
+    1135,
+    200,
+    258,
+    12,
+    111,
+    0,
+    0,
+    0,
+    1,
+    23
+   ],
+   "mean_pred": [
+    0.0391096207917693,
+    0.1605062690151876,
+    0.23763444934035957,
+    0.37257976467540627,
+    0.4449745075546805,
+    -1.0,
+    -1.0,
+    -1.0,
+    0.8517385462015655,
+    1.0
+   ],
+   "obs_freq": [
+    0.11101321585903083,
+    0.45,
+    0.562015503875969,
+    0.75,
+    0.8558558558558559,
+    -1.0,
+    -1.0,
+    -1.0,
+    1.0,
+    1.0
+   ]
+  },
+  "n_chips_case_holdout": 1740,
+  "n_tor_case_holdout": 489,
+  "n_blocks_case_holdout": 13
+ }
+}

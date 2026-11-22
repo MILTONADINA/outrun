@@ -1,0 +1,128 @@
+[
+  {
+    "model": "storm.unet_vil_ir",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:29:33Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "storm.unet_vil_ir",
+    "split": "case_holdout",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:29:33Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "storm.unet_vil_only",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:29:33Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "tornado.cnn",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:34:19Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "tornado.cnn",
+    "split": "case_holdout",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:34:19Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "wildfire.unet",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:40:16Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "wildfire.unet",
+    "split": "test_wsts2021",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:40:16Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "wildfire.unet_uncalibrated",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:40:16Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "ice.milcnn",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:43:15Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "ice.milcnn_calibrated",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:43:15Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "smoke.cnn_mlp",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:45:12Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "smoke.cnn_mlp",
+    "split": "test_spatial",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:45:12Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "smoke.cnn_mlp_no_hms",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:45:12Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "smoke.cnn_mlp_no_hms[test_spatial]",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T16:45:12Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "flood.unet",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T20:10:18Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "flood.unet_raw",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T20:10:18Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "flood.unet_noflash",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T20:10:18Z",
+    "rerun_reason": null
+  },
+  {
+    "model": "flood.unet_noflash_raw",
+    "split": "test",
+    "git_sha": "72d9715-dirty",
+    "utc": "2026-11-21T20:10:18Z",
+    "rerun_reason": null
+  }
+]

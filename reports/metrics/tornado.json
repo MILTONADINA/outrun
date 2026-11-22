@@ -1,0 +1,804 @@
+{
+  "schema": 1,
+  "hazard": "tornado",
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-21T16:34:19Z",
+  "primary_metric": "auc_tor_vs_warned_null",
+  "higher_is_better": true,
+  "n_resamples": 1000,
+  "splits": {
+    "test": {
+      "tornado.cnn": {
+        "kind": "dl",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.7610327798926149,
+            "low": 0.7088038285143532,
+            "high": 0.8097825090597275,
+            "n_resamples": 1000,
+            "n_blocks": 95
+          },
+          "auc": {
+            "estimate": 0.8607457039239196,
+            "low": 0.8245737765952854,
+            "high": 0.8893794143350077,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "auprc": {
+            "estimate": 0.3964267132114189,
+            "low": 0.28505691094772395,
+            "high": 0.4927578488357298,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "csi": {
+            "estimate": 0.2724252491694352,
+            "low": 0.20559371091217218,
+            "high": 0.33190965935105377,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "pod": {
+            "estimate": 0.5495978552278821,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.649272882805817,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.05102409232660022,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.8843483657725143,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.8723047795398867,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.8156058699616869,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "ece": {
+            "estimate": 0.015401068337684625,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.cnn_raw": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.7623309372237866,
+            "low": 0.7092935477790266,
+            "high": 0.8108710543915386,
+            "n_resamples": 1000,
+            "n_blocks": 95
+          },
+          "auc": {
+            "estimate": 0.8620888970808738,
+            "low": 0.8264675740362707,
+            "high": 0.8907338192989492,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "auprc": {
+            "estimate": 0.42322631902774194,
+            "low": 0.3047536252636049,
+            "high": 0.5231058207916038,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "csi": {
+            "estimate": 0.20761245674740483,
+            "low": 0.14160523667862457,
+            "high": 0.260871098301343,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "pod": {
+            "estimate": 0.24128686327077747,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.4019933554817276,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.07515363131674119,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.8857448021534708,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.8732425867458663,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.8176766855640226,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.gbm": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.6481464108927217,
+            "low": 0.5913319655189675,
+            "high": 0.6979869219938345,
+            "n_resamples": 1000,
+            "n_blocks": 95
+          },
+          "auc": {
+            "estimate": 0.7330569375857139,
+            "low": 0.6933673099848215,
+            "high": 0.7689208084747751,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "auprc": {
+            "estimate": 0.15562758763343276,
+            "low": 0.11112237342945089,
+            "high": 0.21059476116842635,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "csi": {
+            "estimate": 0.007782101167315175,
+            "low": 0.0025939497187556703,
+            "high": 0.013212678120058326,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "pod": {
+            "estimate": 0.00804289544235925,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.8064516129032258,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.062213343154719304,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.7285013747862045,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.7069448706679082,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.6956254506383158,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.range_only": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.5534575142513306,
+            "low": 0.4632644554286214,
+            "high": 0.6408328636233606,
+            "n_resamples": 1000,
+            "n_blocks": 95
+          },
+          "auc": {
+            "estimate": 0.6292208408678731,
+            "low": 0.5642118555104235,
+            "high": 0.6857683664652137,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "auprc": {
+            "estimate": 0.10250565682169727,
+            "low": 0.06649880022037526,
+            "high": 0.15505417612310393,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "csi": {
+            "estimate": 0.0,
+            "low": 0.0,
+            "high": 0.0,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "pod": {
+            "estimate": 0.0,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": NaN,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.06325762340143988,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.5688980781860038,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.49519393312077065,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.6217394992436345,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.delta_v_rule": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.5328498850072632,
+            "low": 0.4961822795818262,
+            "high": 0.5718109551270063,
+            "n_resamples": 1000,
+            "n_blocks": 95
+          },
+          "auc": {
+            "estimate": 0.5333227201879479,
+            "low": 0.5043952259077387,
+            "high": 0.5600212120738758,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "auprc": {
+            "estimate": 0.07320745607391219,
+            "low": 0.0510202558699487,
+            "high": 0.09911545276543854,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "csi": {
+            "estimate": 0.07286606523247745,
+            "low": 0.05058374242409639,
+            "high": 0.09824793998033338,
+            "n_resamples": 1000,
+            "n_blocks": 128
+          },
+          "pod": {
+            "estimate": 0.7037533512064343,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.9248281786941581,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.6137449467107681,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.5208906160918545,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.5421919618011308,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.5057257574258126,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornet_published": {
+        "kind": "reference",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.874,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      }
+    },
+    "case_holdout": {
+      "tornado.cnn": {
+        "kind": "dl",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.7991695587856777,
+            "low": 0.6882410352481001,
+            "high": 0.8698772042689601,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auc": {
+            "estimate": 0.8566831606289611,
+            "low": 0.7976697775636797,
+            "high": 0.9020509163550431,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auprc": {
+            "estimate": 0.7024585754204629,
+            "low": 0.6078750454922468,
+            "high": 0.8279056647218638,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "csi": {
+            "estimate": 0.43820224719101125,
+            "low": 0.3680237078209894,
+            "high": 0.5060698100992662,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "pod": {
+            "estimate": 0.558282208588957,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.32923832923832924,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.17567256295037564,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.8856447688564477,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.8417569444444444,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.8340711805555556,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "ece": {
+            "estimate": 0.15717515667104345,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.cnn_raw": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.7998738498700314,
+            "low": 0.689027436082541,
+            "high": 0.871642075088041,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auc": {
+            "estimate": 0.8579148950778028,
+            "low": 0.7988363971087973,
+            "high": 0.9035676826223676,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auprc": {
+            "estimate": 0.7211186613254317,
+            "low": 0.6288390959204785,
+            "high": 0.843735112863798,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "csi": {
+            "estimate": 0.2722007722007722,
+            "low": 0.16914393262728084,
+            "high": 0.3536905601855409,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "pod": {
+            "estimate": 0.2883435582822086,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.17058823529411765,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.14937548934407266,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.8853840806395551,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.8430277777777778,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.8349510732323232,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.gbm": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.632910192987071,
+            "low": 0.5446364765707378,
+            "high": 0.7000050660993759,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auc": {
+            "estimate": 0.7255602470988444,
+            "low": 0.6447245317956111,
+            "high": 0.7894106009983538,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auprc": {
+            "estimate": 0.5002262117212474,
+            "low": 0.33546114050791076,
+            "high": 0.6752287039859871,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "csi": {
+            "estimate": 0.01818181818181818,
+            "low": 0.008063706438657857,
+            "high": 0.03206997084548105,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "pod": {
+            "estimate": 0.018404907975460124,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.4,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.21152454457215214,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.7055526590198123,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.6877638888888888,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.6520517676767676,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.range_only": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.6645028808050981,
+            "low": 0.5648260125925186,
+            "high": 0.7538889343754738,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auc": {
+            "estimate": 0.7013056221689316,
+            "low": 0.6190718691299754,
+            "high": 0.7744063671767926,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auprc": {
+            "estimate": 0.500311849359093,
+            "low": 0.35163847299988804,
+            "high": 0.6278690350523118,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "csi": {
+            "estimate": 0.0,
+            "low": 0.0,
+            "high": 0.0,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "pod": {
+            "estimate": 0.0,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": NaN,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.23487978971931897,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.5813781717066389,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.5255416666666667,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.5724708017676767,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornado.delta_v_rule": {
+        "kind": "baseline",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.5267376049011872,
+            "low": 0.4704771086811811,
+            "high": 0.5763869868379334,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auc": {
+            "estimate": 0.5370795388229294,
+            "low": 0.48547232866936935,
+            "high": 0.5874018115525698,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "auprc": {
+            "estimate": 0.2971713021288499,
+            "low": 0.1871913600835355,
+            "high": 0.4447648160027877,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "csi": {
+            "estimate": 0.2744360902255639,
+            "low": 0.17699407505303022,
+            "high": 0.39908895159457614,
+            "n_resamples": 1000,
+            "n_blocks": 13
+          },
+          "pod": {
+            "estimate": 0.7464212678936605,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "far": {
+            "estimate": 0.697346600331675,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "brier": {
+            "estimate": 0.5545977011494253,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_0-50": {
+            "estimate": 0.5260688216892596,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_50-100": {
+            "estimate": 0.5086458333333334,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          },
+          "auc_range_100+": {
+            "estimate": 0.5523674242424242,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      },
+      "tornet_published": {
+        "kind": "reference",
+        "metrics": {
+          "auc_tor_vs_warned_null": {
+            "estimate": 0.874,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      }
+    }
+  },
+  "ablations": {}
+}

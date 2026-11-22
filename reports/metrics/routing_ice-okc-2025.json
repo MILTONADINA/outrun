@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "scenario": "ice-okc-2025",
+  "primary": false,
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-22T10:58:12Z",
+  "n_origins": 100,
+  "n_paired": 100,
+  "planners": {
+    "a": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 83.0,
+      "mean_exposure_risk_min": 7.850207258256266,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "a_prime": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 83.0,
+      "mean_exposure_risk_min": 7.85643565928764,
+      "mean_travel_time_ratio": 1.0007000414511056,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.1404333351768317
+    },
+    "b": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 83.0,
+      "mean_exposure_risk_min": 8.250054828711662,
+      "mean_travel_time_ratio": 1.0490655376593647,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 1.6758554024457641
+    },
+    "c": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 83.0,
+      "mean_exposure_risk_min": 7.85643565928764,
+      "mean_travel_time_ratio": 1.0007000414511056,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.1404333351768317
+    },
+    "d": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 81.0,
+      "mean_exposure_risk_min": 7.361684378205788,
+      "mean_travel_time_ratio": 1.0054556472313383,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 7.361684378205788
+    }
+  },
+  "gap_closed": {
+    "estimate": -0.01274945613750986,
+    "low": -0.05231002185784616,
+    "high": -0.0031537997442586453,
+    "n_resamples": 1000,
+    "n_blocks": 100
+  },
+  "c_minus_b": {
+    "estimate": -0.3936191694240205,
+    "low": -0.7821217006564622,
+    "high": -0.09126300767835005,
+    "n_resamples": 1000,
+    "n_blocks": 100
+  },
+  "c_minus_a_prime": {
+    "estimate": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "n_resamples": 1000,
+    "n_blocks": 100
+  }
+}

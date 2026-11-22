@@ -1,0 +1,67 @@
+{
+ "notes": [
+  "Primary metric rmse_smoke_episodes is RMSE of the q50 forecast (ug/m3, +6 h) over rows where HMS shows medium/heavy smoke at the monitor at the target time (HMS is used only to select rows, never as input to scoring). LOWER is better.",
+  "CIs: day-block bootstrap over UTC issue days (per-day sufficient statistics, seed 0). Rows within a day across monitors are resampled together, so the CI reflects day-to-day and not monitor-level variability.",
+  "CSI/POD/FAR use obs and q50 > 35.4 ug/m3. Persistence beats the model on CSI/POD on val; the CNN wins RMSE/MAE. HMS adds nothing measurable on val (the no-HMS ablation is equal or better).",
+  "q90_coverage uses the raw q90 head; q90_coverage_shifted adds the val-fitted frozen log shift from models/smoke/calibration.json (the adapter does not apply it). Nothing is refit or tuned on test.",
+  "AQS hour value labelled t covers t..t+1 h, so the newest history hour is available at t+1 h: up to 1 h latency leak in the history features (spec-mandated). HRRR-Smoke store is 9 km (81 km patch).",
+  "Calibrated HRRR baseline uses the frozen train-fit models/smoke/massden_calibration.json; linear regression is fitted on a 400k-row TRAIN subsample (seed 0). Baseline rows with an all-NaN history (persistence) are dropped for that baseline only.",
+  "test_spatial = rows at the 198 spatially held-out monitors (inside the test year, never seen in train/val); the main model and baselines are scored on it as an extra split key. case_holdout is empty for smoke (no quarantined smoke days), so there is no case_holdout key."
+ ],
+ "figures": {
+  "q50_reliability": {
+   "level": 0.5,
+   "bin_mean_pred": [
+    1.8866654366386901,
+    3.1380217741367207,
+    3.9159827894466166,
+    4.619443320710977,
+    5.33018982637432,
+    6.104319379671833,
+    7.011444735725506,
+    8.165881931791668,
+    9.899296038700657,
+    15.179862027362475
+   ],
+   "bin_coverage": [
+    0.5016536773855524,
+    0.522934728328053,
+    0.5273964191860894,
+    0.5248913230346047,
+    0.5183502386390615,
+    0.5115429956120243,
+    0.5018706355248831,
+    0.4926852829694395,
+    0.4792592774516787,
+    0.46329982317113105
+   ]
+  },
+  "q90_reliability": {
+   "level": 0.9,
+   "bin_mean_pred": [
+    4.584645211930267,
+    6.179423186850243,
+    7.302163341159695,
+    8.364890831359347,
+    9.459429098470977,
+    10.660056120258197,
+    12.070733556803164,
+    13.88191158972831,
+    16.617692254074033,
+    25.87070280791166
+   ],
+   "bin_coverage": [
+    0.9109715763966206,
+    0.9120842236248577,
+    0.9155553372465227,
+    0.9121579029234308,
+    0.9115602819461158,
+    0.9116838037854477,
+    0.9093246009005321,
+    0.9094652564018599,
+    0.911683080777071,
+    0.9049790425044207
+   ]
+  }
+ }
+}

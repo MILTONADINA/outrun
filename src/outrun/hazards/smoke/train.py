@@ -48,6 +48,7 @@ class SmokePart:
     episode: np.ndarray  # (N,) HMS medium/heavy at the site at the target time (evaluation only)
     month: np.ndarray  # (N,) calendar month of the issue time
     site_id: np.ndarray  # (N,)
+    issue_time: np.ndarray | None = None  # (N,) datetime64[ns] issue time (UTC), for day-block bootstraps
 
     def __len__(self) -> int:
         return len(self.cycle)
@@ -57,9 +58,12 @@ class SmokeData:
     """Patch store in RAM + parts for the requested splits."""
 
     def __init__(
-        self, parts: tuple[str, ...] = ("train", "val"), cfg: SmokeFeatureConfig | None = None
+        self,
+        parts: tuple[str, ...] = ("train", "val"),
+        cfg: SmokeFeatureConfig | None = None,
+        allow_test: bool = False,
     ) -> None:
-        if any(p.startswith("test") for p in parts):
+        if not allow_test and any(p.startswith("test") for p in parts):
             raise ValueError("test parts are scored once, in T24, not here")
         d = smoke_dir()
         cfg = cfg or SmokeFeatureConfig()
@@ -80,7 +84,7 @@ class SmokeData:
             self.parts[part] = SmokePart(
                 cyc, site, tab, hist, t["target"].to_numpy(dtype=np.float32), t["pm_target"].to_numpy(dtype=np.float32),
                 t["background"].to_numpy(dtype=np.float32), is_smoke_episode(hms[cyc + 1, site]), times.month.to_numpy(),
-                t["site_id"].to_numpy(),
+                t["site_id"].to_numpy(), times.tz_convert("UTC").tz_localize(None).to_numpy(),
             )  # fmt: skip
 
     def batch(self, part: SmokePart, idx: np.ndarray) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:

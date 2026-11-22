@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "scenario": "smoke-okc-2024",
+  "primary": false,
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-22T10:59:23Z",
+  "n_origins": 100,
+  "n_paired": 100,
+  "planners": {
+    "a": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 0.0,
+      "mean_exposure_risk_min": 0.0,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "a_prime": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 0.0,
+      "mean_exposure_risk_min": 0.0,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "b": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 0.0,
+      "mean_exposure_risk_min": 0.0,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "c": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 0.0,
+      "mean_exposure_risk_min": 0.0,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    },
+    "d": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 0.0,
+      "mean_exposure_risk_min": 0.0,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.0
+    }
+  },
+  "gap_closed": {
+    "estimate": NaN,
+    "low": NaN,
+    "high": NaN,
+    "n_resamples": 0,
+    "n_blocks": 100
+  },
+  "c_minus_b": {
+    "estimate": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "n_resamples": 1000,
+    "n_blocks": 100
+  },
+  "c_minus_a_prime": {
+    "estimate": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "n_resamples": 1000,
+    "n_blocks": 100
+  }
+}

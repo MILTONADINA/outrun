@@ -25,8 +25,8 @@ from enum import StrEnum
 
 import numpy as np
 
-from outrun.eval.bootstrap import CI
-from outrun.eval.metrics import RouteTrace
+from outrun.eval.bootstrap import CI, gap_closed_ci, paired_bootstrap_ci
+from outrun.eval.metrics import RouteTrace, score_route
 
 __all__ = [
     "PLANNER_ORDER",
@@ -96,7 +96,19 @@ def sample_origins(
     node_ids: Sequence[int] | np.ndarray, weights: Sequence[float] | np.ndarray, n: int = 500, seed: int = 0
 ) -> np.ndarray:
     """EVAL-13. ``n`` population-weighted origins drawn with replacement, P(node) proportional to its weight."""
-    raise NotImplementedError
+    ids = np.asarray(node_ids)
+    w = np.asarray(weights, dtype=np.float64)
+    if len(ids) != len(w):
+        raise ValueError("node_ids and weights must have the same length")
+    if n < 1:
+        raise ValueError("n must be >= 1")
+    if np.isnan(w).any() or (w < 0).any():
+        raise ValueError("weights must be non-negative and not NaN")
+    total = w.sum()
+    if total <= 0:
+        raise ValueError("at least one weight must be positive")
+    rng = np.random.default_rng(seed)
+    return ids[rng.choice(len(ids), size=n, replace=True, p=w / total)]
 
 
 def evaluate_planners(
@@ -113,4 +125,78 @@ def evaluate_planners(
     observed_node_risk: np.ndarray | None = None,
 ) -> RoutingEvalResult:
     """EVAL-14/EVAL-15. Route every origin with all five planners and score every route on observed arrays."""
-    raise NotImplementedError
+    origins = list(origins)
+    if not origins:
+        raise ValueError("origins must not be empty")
+    crossing = frozenset(int(e) for e in crossing_edges)
+    routes: dict[PlannerKind, list[RouteTrace | None]] = {k: [] for k in PLANNER_ORDER}
+    for origin in origins:
+        for kind in PLANNER_ORDER:
+            routes[kind].append(plan(kind, origin))
+
+    def score(trace: RouteTrace, risk: np.ndarray, blocked: np.ndarray | None, node_risk: np.ndarray | None):
+        return score_route(
+            trace,
+            risk,
+            blocked,
+            slot_s=slot_s,
+            threshold=threshold,
+            crossing_edges=crossing,
+            node_risk=node_risk,
+        )
+
+    paired = [i for i in range(len(origins)) if all(routes[k][i] is not None for k in PLANNER_ORDER)]
+    n_paired = len(paired)
+    scores = {
+        k: [score(routes[k][i], observed_risk, observed_blocked, observed_node_risk) for i in paired]
+        for k in PLANNER_ORDER
+    }
+    exposure = {
+        k: np.array([s.exposure_risk_min for s in scores[k]], dtype=np.float64) for k in PLANNER_ORDER
+    }
+    base_time = np.array([s.travel_time_s for s in scores[PlannerKind.NO_HAZARD]], dtype=np.float64)
+
+    summaries: dict[PlannerKind, PlannerSummary] = {}
+    for k in PLANNER_ORDER:
+        n_routed = sum(r is not None for r in routes[k])
+        sc = scores[k]
+        if n_paired:
+            times = np.array([s.travel_time_s for s in sc], dtype=np.float64)
+            with np.errstate(invalid="ignore", divide="ignore"):
+                ratio = np.where(base_time > 0, times / np.where(base_time > 0, base_time, 1.0), np.nan)
+            ratio_mean = float(np.nanmean(ratio)) if np.isfinite(ratio).any() else float("nan")
+            pct = 100.0 * float(np.mean([s.intersects for s in sc]))
+            mean_exp = float(np.mean(exposure[k]))
+            crossings = int(sum(s.blocked_crossings for s in sc))
+        else:
+            ratio_mean = pct = mean_exp = float("nan")
+            crossings = 0
+        predicted = None
+        if predicted_risk is not None and k in predicted_risk and n_paired:
+            predicted = float(
+                np.mean(
+                    [
+                        score_route(
+                            routes[k][i], predicted_risk[k], slot_s=slot_s, threshold=threshold
+                        ).exposure_risk_min
+                        for i in paired
+                    ]
+                )
+            )
+        summaries[k] = PlannerSummary(
+            n_routed, len(origins) - n_routed, pct, mean_exp, ratio_mean, crossings, predicted
+        )
+
+    if n_paired < 2:
+        nan_ci = CI(float("nan"), float("nan"), float("nan"), 0, n_paired)
+        gap, c_b, c_ap = nan_ci, nan_ci, nan_ci
+    else:
+        ea, eap, eb, ec, ed = (exposure[k] for k in PLANNER_ORDER)
+        gap = gap_closed_ci(ea, ec, ed, n_resamples=n_resamples, seed=seed)
+        c_b = paired_bootstrap_ci(
+            lambda c, b: float(np.mean(c - b)), (ec, eb), n_resamples=n_resamples, seed=seed
+        )
+        c_ap = paired_bootstrap_ci(
+            lambda c, a: float(np.mean(c - a)), (ec, eap), n_resamples=n_resamples, seed=seed
+        )
+    return RoutingEvalResult(len(origins), n_paired, summaries, gap, c_b, c_ap)

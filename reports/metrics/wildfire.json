@@ -1,0 +1,363 @@
+{
+  "schema": 1,
+  "hazard": "wildfire",
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-21T16:40:16Z",
+  "primary_metric": "prauc",
+  "higher_is_better": true,
+  "n_resamples": 1000,
+  "splits": {
+    "test": {
+      "wildfire.unet": {
+        "kind": "dl",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.35650974848618533,
+            "low": 0.34009972094904756,
+            "high": 0.3727964229532945,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "prauc_new_burn": {
+            "estimate": 0.25971779380708815,
+            "low": 0.2462642270045643,
+            "high": 0.27365970049769334,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "brier": {
+            "estimate": 0.009786051964997513,
+            "low": 0.009091981535014846,
+            "high": 0.010553308425899402,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "ece": {
+            "estimate": 0.0028471118605700872,
+            "low": 0.002298393772019843,
+            "high": 0.003412168969496777,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          }
+        }
+      },
+      "persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.10654796377303914,
+            "low": 0.09668422952965874,
+            "high": 0.1170429887140226,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "prauc_new_burn": {
+            "estimate": 0.009220647524441742,
+            "low": 0.008540881215097017,
+            "high": 0.009985413556970572,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "brier": {
+            "estimate": 0.015268816277303726,
+            "low": 0.014228407363293482,
+            "high": 0.016430622497713664,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "ece": {
+            "estimate": 0.015268816277303726,
+            "low": 0.014228407363293482,
+            "high": 0.016430622497713664,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          }
+        }
+      },
+      "downwind_persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.11424183378813654,
+            "low": 0.10402758519916114,
+            "high": 0.12441532678603195,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "prauc_new_burn": {
+            "estimate": 0.025944782957998763,
+            "low": 0.02380458661275806,
+            "high": 0.028032370119458305,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "brier": {
+            "estimate": 0.017240812943623073,
+            "low": 0.016093668213315822,
+            "high": 0.01852879279658726,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "ece": {
+            "estimate": 0.017240812943623073,
+            "low": 0.016093668213315822,
+            "high": 0.01852879279658726,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          }
+        }
+      },
+      "pixel_logistic": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.15335733109556604,
+            "low": 0.13878794667238678,
+            "high": 0.16838883881119165,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "prauc_new_burn": {
+            "estimate": 0.019910441609336818,
+            "low": 0.01812859022402829,
+            "high": 0.02188554284423782,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "brier": {
+            "estimate": 0.01110163836104976,
+            "low": 0.010332935166028904,
+            "high": 0.011952979678920487,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          },
+          "ece": {
+            "estimate": 0.0008520307283127737,
+            "low": 0.00027172591286690116,
+            "high": 0.0015861020449452218,
+            "n_resamples": 1000,
+            "n_blocks": 1689
+          }
+        }
+      },
+      "ndws_published": {
+        "kind": "reference",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.284,
+            "low": NaN,
+            "high": NaN,
+            "n_resamples": 0,
+            "n_blocks": 0
+          }
+        }
+      }
+    },
+    "test_wsts2021": {
+      "wildfire.unet": {
+        "kind": "dl",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.37214773453562766,
+            "low": 0.32293836178025825,
+            "high": 0.40983380033535166,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_new_burn": {
+            "estimate": 0.05980828559802015,
+            "low": 0.0507845402683062,
+            "high": 0.06719659000360889,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "brier": {
+            "estimate": 0.00470487513393693,
+            "low": 0.0037798545537437995,
+            "high": 0.005748138783487045,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "ece": {
+            "estimate": 0.011071749180859333,
+            "low": 0.010378619141866949,
+            "high": 0.01180984969316053,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_per_fire_macro": {
+            "estimate": 0.20519594543061404,
+            "low": 0.17792300618538426,
+            "high": 0.23278106033114052,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          }
+        }
+      },
+      "persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.43310781122609693,
+            "low": 0.3919975795283148,
+            "high": 0.4640660808230863,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_new_burn": {
+            "estimate": 0.0018196614919736471,
+            "low": 0.0014035153714430364,
+            "high": 0.0022635747258861858,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "brier": {
+            "estimate": 0.003587348594185464,
+            "low": 0.0027714162656532247,
+            "high": 0.004445510251370798,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "ece": {
+            "estimate": 0.003587348594185464,
+            "low": 0.0027714162656532247,
+            "high": 0.004445510251370798,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_per_fire_macro": {
+            "estimate": 0.2343641652363551,
+            "low": 0.20650451655296434,
+            "high": 0.2633826156654906,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          }
+        }
+      },
+      "downwind_persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.391453445561296,
+            "low": 0.356171866424027,
+            "high": 0.4173520928207898,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_new_burn": {
+            "estimate": 0.03871533971772775,
+            "low": 0.03470293993124403,
+            "high": 0.04231444118953741,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "brier": {
+            "estimate": 0.004666283705159606,
+            "low": 0.003583001358688891,
+            "high": 0.005851742148042194,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "ece": {
+            "estimate": 0.004666283705159606,
+            "low": 0.003583001358688891,
+            "high": 0.005851742148042194,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_per_fire_macro": {
+            "estimate": 0.21565214476491618,
+            "low": 0.1911380566673705,
+            "high": 0.24176425362344595,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          }
+        }
+      },
+      "pixel_logistic": {
+        "kind": "baseline",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.4560769917248513,
+            "low": 0.4158368468954881,
+            "high": 0.4882913377759193,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_new_burn": {
+            "estimate": 0.0027257918770112652,
+            "low": 0.0019440425942678899,
+            "high": 0.0036282188519583414,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "brier": {
+            "estimate": 0.00351566654390138,
+            "low": 0.0026629200678660423,
+            "high": 0.004426124493376709,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "ece": {
+            "estimate": 0.011756983136469125,
+            "low": 0.010983566274917467,
+            "high": 0.012478899709581383,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_per_fire_macro": {
+            "estimate": 0.25214938904346085,
+            "low": 0.22498465235344597,
+            "high": 0.2826682042917547,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          }
+        }
+      }
+    }
+  },
+  "ablations": {
+    "no_calibration": {
+      "wildfire.unet_uncalibrated": {
+        "kind": "dl",
+        "metrics": {
+          "prauc": {
+            "estimate": 0.3723775817759621,
+            "low": 0.32311641921445705,
+            "high": 0.4101065393826552,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_new_burn": {
+            "estimate": 0.059834561325347174,
+            "low": 0.05082659740213637,
+            "high": 0.06722516465308902,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "brier": {
+            "estimate": 0.01210728450176758,
+            "low": 0.010101676687706071,
+            "high": 0.014376485738409045,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "ece": {
+            "estimate": 0.015605492443863203,
+            "low": 0.013304485108169761,
+            "high": 0.018104780105039638,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          },
+          "prauc_per_fire_macro": {
+            "estimate": 0.20519594544091382,
+            "low": 0.17792300619802065,
+            "high": 0.2327810603484714,
+            "n_resamples": 1000,
+            "n_blocks": 156
+          }
+        }
+      }
+    }
+  }
+}

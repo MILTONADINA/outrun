@@ -1,0 +1,652 @@
+{
+  "schema": 1,
+  "hazard": "flood",
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-21T20:10:18Z",
+  "primary_metric": "auprc",
+  "higher_is_better": true,
+  "n_resamples": 1000,
+  "splits": {
+    "test": {
+      "flood.unet": {
+        "kind": "dl",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.22389742093550435,
+            "low": 0.19133668285524688,
+            "high": 0.25520145484290246,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.8061970074828927,
+            "low": 0.791385134114789,
+            "high": 0.818067060184374,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.840865395108462,
+            "low": 0.8212474332089672,
+            "high": 0.8562558772544977,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.03787594002108959,
+            "low": 0.03270539830008509,
+            "high": 0.04355774871809532,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.03540595571392212,
+            "low": 0.025454200373447654,
+            "high": 0.0454135848377162,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.036093374189514214,
+            "low": 0.025832704814941758,
+            "high": 0.04640463339772736,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.34977096382163225,
+            "low": 0.2364120053109913,
+            "high": 0.4536865654085561,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.05176889793840672,
+            "low": 0.038290783808089444,
+            "high": 0.06535430675411188,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.09636030374443572,
+            "low": 0.07693893578541393,
+            "high": 0.11372431553507327,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.005680204487361545,
+            "low": 0.002980648756549417,
+            "high": 0.00807232235595826,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "ece": {
+            "estimate": 0.0008348822306435949,
+            "low": 0.0007158020410364516,
+            "high": 0.0053522189812897,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "flood.unet_raw": {
+        "kind": "dl",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.22639347205218008,
+            "low": 0.19349311083853873,
+            "high": 0.2579400617504033,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.8062405550706373,
+            "low": 0.7914338875404355,
+            "high": 0.8181127923599275,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.8409156750043423,
+            "low": 0.8212957835731417,
+            "high": 0.8563022559203991,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.048284809300391404,
+            "low": 0.043846686515100264,
+            "high": 0.05309220040830579,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.02262551294956503,
+            "low": 0.015103501081614772,
+            "high": 0.030766448234462434,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.02282203431607843,
+            "low": 0.015189816919611921,
+            "high": 0.031013729371431265,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.2756718179572342,
+            "low": 0.17481704513126498,
+            "high": 0.3816310509167657,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.034045446516915975,
+            "low": 0.023100647779960872,
+            "high": 0.0452730911171027,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.06598586017282011,
+            "low": 0.050180730501476034,
+            "high": 0.07996126148497641,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.0031241124680488497,
+            "low": 0.0011580775911986102,
+            "high": 0.00522140550289405,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "ece": {
+            "estimate": 0.0996282081974491,
+            "low": 0.0955979868595575,
+            "high": 0.10376745462863178,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "ffg_ratio_ge_1": {
+        "kind": "baseline",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.06518362096603181,
+            "low": 0.054088500767488445,
+            "high": 0.07477182896270222,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.5309014463808476,
+            "low": 0.5235266666435483,
+            "high": 0.5382133736030891,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.5321765977866726,
+            "low": 0.5241400471688605,
+            "high": 0.5401119358911938,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.046334148713184475,
+            "low": 0.0392176544216486,
+            "high": 0.05417874549530169,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.06010621053769085,
+            "low": 0.04683446512308873,
+            "high": 0.07278668562761745,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.06734696878099998,
+            "low": 0.05109892584875885,
+            "high": 0.08324252816773944,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.641414815872241,
+            "low": 0.54850147876445,
+            "high": 0.7054911431663035,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.1101949766120691,
+            "low": 0.09262146574678486,
+            "high": 0.12711941818195122,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.24456664048180152,
+            "low": 0.21335198718532364,
+            "high": 0.27094140137703676,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.15904572564612326,
+            "low": 0.14533926950812845,
+            "high": 0.17295503222959682,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "qpe_ari_ge_10yr": {
+        "kind": "baseline",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.06054933014531268,
+            "low": 0.05008492479803968,
+            "high": 0.0699365760041568,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.5196246893314873,
+            "low": 0.5139764943483457,
+            "high": 0.5266344566460104,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.5194653584480061,
+            "low": 0.5136913722552134,
+            "high": 0.5266609210842246,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.04448652092822025,
+            "low": 0.03822028330337984,
+            "high": 0.05128861589684148,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.03958905977626004,
+            "low": 0.028925983134777747,
+            "high": 0.05292370961128945,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.04167953152040517,
+            "low": 0.030243417989749,
+            "high": 0.05625993912168583,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.5588711818173496,
+            "low": 0.4962198885555078,
+            "high": 0.6295683676983092,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.07932516557053033,
+            "low": 0.0623645120368196,
+            "high": 0.0983939961480282,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.1914113642314742,
+            "low": 0.16862142188149698,
+            "high": 0.21456488903848245,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.15563760295370632,
+            "low": 0.14288970323074185,
+            "high": 0.16890521976672201,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "ari_rule_3h50_6h75": {
+        "kind": "baseline",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.06821945496721793,
+            "low": 0.05628683291898211,
+            "high": 0.07934773819300302,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.5392786056247195,
+            "low": 0.5305600763569129,
+            "high": 0.549546194166878,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.5396649417589943,
+            "low": 0.5304367295931466,
+            "high": 0.550232847347785,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.04820765150625842,
+            "low": 0.04202419646933891,
+            "high": 0.054789220267902713,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.07353205729170476,
+            "low": 0.058836417953268785,
+            "high": 0.09003387368219012,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.08696381667994232,
+            "low": 0.06820239221056666,
+            "high": 0.10844050925124282,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.6774688140518799,
+            "low": 0.6181767357865443,
+            "high": 0.7324725189801151,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.11007796948791114,
+            "low": 0.09236376715983838,
+            "high": 0.12873614788861631,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.23487824037706206,
+            "low": 0.20930516776698868,
+            "high": 0.2578430244022553,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.2223800056802045,
+            "low": 0.20571692686177093,
+            "high": 0.23913629189375818,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "logistic_regression": {
+        "kind": "baseline",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.14442269891467266,
+            "low": 0.1193895614668392,
+            "high": 0.16709776441366558,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.6895501180910161,
+            "low": 0.6600517590848782,
+            "high": 0.7135194919630258,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.6795006695170538,
+            "low": 0.6411051332381913,
+            "high": 0.7126983181826329,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.04025956842532646,
+            "low": 0.03446848429298585,
+            "high": 0.046523023044245944,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.026303262917384856,
+            "low": 0.01739945528150511,
+            "high": 0.03565367061772238,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.027240625089189112,
+            "low": 0.01789681046794165,
+            "high": 0.03747740937218789,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.5667657010811257,
+            "low": 0.3971933378527375,
+            "high": 0.6798518323468997,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.05472935957563368,
+            "low": 0.0409307214586372,
+            "high": 0.06834011614243135,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.13747054202670855,
+            "low": 0.11328896767922579,
+            "high": 0.15804476213750407,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.054245952854302754,
+            "low": 0.04665801745355268,
+            "high": 0.062000714112654134,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "ece": {
+            "estimate": 0.004955280264301993,
+            "low": 0.0012108659535766538,
+            "high": 0.01083824616246558,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      }
+    }
+  },
+  "ablations": {
+    "no_flash": {
+      "flood.unet_noflash": {
+        "kind": "dl",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.20735533297976155,
+            "low": 0.17462656484979303,
+            "high": 0.23635443667460956,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.7936751926880978,
+            "low": 0.7794688858482979,
+            "high": 0.8056707884937335,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.8099264965051187,
+            "low": 0.7898083185616983,
+            "high": 0.8270797404409574,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.038354882567705625,
+            "low": 0.03307121878229601,
+            "high": 0.043916358894295876,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.021325578265926473,
+            "low": 0.013967606896416494,
+            "high": 0.029924886932233507,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.021518684091948893,
+            "low": 0.014053977774329597,
+            "high": 0.030204570909982152,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.2961726683827897,
+            "low": 0.2082573437664147,
+            "high": 0.4118588465148254,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.03202222296504477,
+            "low": 0.021783469149767136,
+            "high": 0.04376035465491388,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.06074888714323121,
+            "low": 0.04566590372151898,
+            "high": 0.07567022908734365,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.007100255609201931,
+            "low": 0.0043184843663755315,
+            "high": 0.009895820196490083,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "ece": {
+            "estimate": 0.0019518456262447987,
+            "low": 0.0008946323558148149,
+            "high": 0.006446398494556612,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      },
+      "flood.unet_noflash_raw": {
+        "kind": "dl",
+        "metrics": {
+          "auprc": {
+            "estimate": 0.20963959562054216,
+            "low": 0.17652699582254572,
+            "high": 0.2389381262362507,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "roc_auc": {
+            "estimate": 0.7937451184300617,
+            "low": 0.7795554210340705,
+            "high": 0.80575893533643,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "auc_vs_hard_negative": {
+            "estimate": 0.8100068133519835,
+            "low": 0.7898794275482943,
+            "high": 0.8271588648455088,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "brier": {
+            "estimate": 0.04969345966404611,
+            "low": 0.04531983284354534,
+            "high": 0.05434589088554495,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "csi_pixel_p50": {
+            "estimate": 0.005956480448520472,
+            "low": 0.0029744039115785336,
+            "high": 0.009074151569103727,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "pod_pixel_p50": {
+            "estimate": 0.005961508357614394,
+            "low": 0.0029778636767778875,
+            "high": 0.0090848787634601,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "far_pixel_p50": {
+            "estimate": 0.12403100775193798,
+            "low": 0.03779152132025686,
+            "high": 0.26021045759675876,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "neighbourhood_csi_r2_p50": {
+            "estimate": 0.00971114569570188,
+            "low": 0.0049399567735249235,
+            "high": 0.014591313240066973,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "event_pod_p50": {
+            "estimate": 0.020162346163917256,
+            "low": 0.011840451253769398,
+            "high": 0.028875825239382272,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "hard_neg_alarm_rate_p50": {
+            "estimate": 0.001136040897472309,
+            "low": 0.0,
+            "high": 0.0023711256635232307,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          },
+          "ece": {
+            "estimate": 0.10376418490153563,
+            "low": 0.09914244191230902,
+            "high": 0.10818226017803884,
+            "n_resamples": 1000,
+            "n_blocks": 183
+          }
+        }
+      }
+    }
+  }
+}

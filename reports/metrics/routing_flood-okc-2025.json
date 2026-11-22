@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "scenario": "flood-okc-2025",
+  "primary": false,
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-22T10:56:55Z",
+  "n_origins": 100,
+  "n_paired": 95,
+  "planners": {
+    "a": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 15.789473684210526,
+      "mean_exposure_risk_min": 1.1561894955045762,
+      "mean_travel_time_ratio": 1.0,
+      "blocked_crossings": 11,
+      "mean_predicted_exposure": 0.0
+    },
+    "a_prime": {
+      "n_routed": 95,
+      "n_failed": 5,
+      "pct_intersect": 12.631578947368421,
+      "mean_exposure_risk_min": 0.7975579891193326,
+      "mean_travel_time_ratio": 1.033811457436623,
+      "blocked_crossings": 4,
+      "mean_predicted_exposure": 0.5465424285032341
+    },
+    "b": {
+      "n_routed": 100,
+      "n_failed": 0,
+      "pct_intersect": 14.736842105263156,
+      "mean_exposure_risk_min": 0.9648836242727459,
+      "mean_travel_time_ratio": 1.0266031447003803,
+      "blocked_crossings": 10,
+      "mean_predicted_exposure": 0.05489233838825158
+    },
+    "c": {
+      "n_routed": 95,
+      "n_failed": 5,
+      "pct_intersect": 12.631578947368421,
+      "mean_exposure_risk_min": 0.7975579891193326,
+      "mean_travel_time_ratio": 1.033811457436623,
+      "blocked_crossings": 4,
+      "mean_predicted_exposure": 0.5465424285032341
+    },
+    "d": {
+      "n_routed": 98,
+      "n_failed": 2,
+      "pct_intersect": 12.631578947368421,
+      "mean_exposure_risk_min": 0.7579174108345013,
+      "mean_travel_time_ratio": 1.0521997468071158,
+      "blocked_crossings": 0,
+      "mean_predicted_exposure": 0.7579174108345013
+    }
+  },
+  "gap_closed": {
+    "estimate": 0.9004685997069836,
+    "low": 0.3281054179814281,
+    "high": 1.2181456406784417,
+    "n_resamples": 1000,
+    "n_blocks": 95
+  },
+  "c_minus_b": {
+    "estimate": -0.16732563515341325,
+    "low": -0.5784237861998047,
+    "high": 0.22750382156676022,
+    "n_resamples": 1000,
+    "n_blocks": 95
+  },
+  "c_minus_a_prime": {
+    "estimate": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "n_resamples": 1000,
+    "n_blocks": 95
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "schema": 1,
+  "hazard": "ice",
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-21T16:43:15Z",
+  "primary_metric": "zone_auprc",
+  "higher_is_better": true,
+  "n_resamples": 1000,
+  "splits": {
+    "test": {
+      "ice.milcnn": {
+        "kind": "dl",
+        "metrics": {
+          "zone_auprc": {
+            "estimate": 0.800861826471545,
+            "low": 0.6223068199654859,
+            "high": 0.8582432691317714,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "roc_auc": {
+            "estimate": 0.962707479056098,
+            "low": 0.9492104419948363,
+            "high": 0.978568145207232,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "brier": {
+            "estimate": 0.038244418283496166,
+            "low": 0.02027243454226694,
+            "high": 0.05768961333474725,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "bss_vs_climatology": {
+            "estimate": 0.5806471758956395,
+            "low": 0.48183328773644846,
+            "high": 0.6376743738576442,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "ece": {
+            "estimate": 0.011034504987361528,
+            "low": 0.007649425785023125,
+            "high": 0.028256603933490703,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "csi": {
+            "estimate": 0.5701341065603479,
+            "low": 0.40130654927061593,
+            "high": 0.6418823107846956,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "auprc_minus_physics_rule": {
+            "estimate": 0.2096238400028454,
+            "low": 0.11877332471983475,
+            "high": 0.3263392577149495,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "auprc_minus_logistic": {
+            "estimate": -0.0032169614715269468,
+            "low": -0.04541203789599498,
+            "high": 0.0772555839331479,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          }
+        }
+      },
+      "ice.milcnn_calibrated": {
+        "kind": "dl",
+        "metrics": {
+          "zone_auprc": {
+            "estimate": 0.7857889016757881,
+            "low": 0.599034010469189,
+            "high": 0.8457431419844321,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "roc_auc": {
+            "estimate": 0.9609272576520664,
+            "low": 0.9469387972048724,
+            "high": 0.9780472731834869,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "brier": {
+            "estimate": 0.039400370246633405,
+            "low": 0.018412364649958494,
+            "high": 0.06164827807943724,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "bss_vs_climatology": {
+            "estimate": 0.5679720786650517,
+            "low": 0.49771488062471336,
+            "high": 0.6331172987283739,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "ece": {
+            "estimate": 0.014540660080458765,
+            "low": 0.005870361814310474,
+            "high": 0.03953019864880816,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "csi": {
+            "estimate": 0.5050623052959502,
+            "low": 0.3649561325771003,
+            "high": 0.5663895518435094,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          }
+        }
+      },
+      "physics_rule": {
+        "kind": "baseline",
+        "metrics": {
+          "zone_auprc": {
+            "estimate": 0.5912379864686996,
+            "low": 0.3741271003715347,
+            "high": 0.7123062046166845,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "roc_auc": {
+            "estimate": 0.8690862363366949,
+            "low": 0.8141644459400228,
+            "high": 0.9080925025620747,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "brier": {
+            "estimate": 0.049600205242228586,
+            "low": 0.030210285518721753,
+            "high": 0.07005406532251564,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "bss_vs_climatology": {
+            "estimate": 0.4561301471420105,
+            "low": 0.22459890806972843,
+            "high": 0.6024702646592834,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "ece": {
+            "estimate": 0.04960020524222859,
+            "low": 0.030210285518721756,
+            "high": 0.07005406532251564,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "csi": {
+            "estimate": 0.6047700170357752,
+            "low": 0.42226906421015864,
+            "high": 0.7072522224152069,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          }
+        }
+      },
+      "logistic": {
+        "kind": "baseline",
+        "metrics": {
+          "zone_auprc": {
+            "estimate": 0.804078787943072,
+            "low": 0.5872054041011358,
+            "high": 0.8762176683603187,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "roc_auc": {
+            "estimate": 0.9640939427895923,
+            "low": 0.9369190022057294,
+            "high": 0.9764777151099356,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "brier": {
+            "estimate": 0.036438742261112426,
+            "low": 0.020262697405845808,
+            "high": 0.05283382159517499,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "bss_vs_climatology": {
+            "estimate": 0.6004465446241976,
+            "low": 0.46868556276064155,
+            "high": 0.6773080167775308,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "ece": {
+            "estimate": 0.009587979633729532,
+            "low": 0.008000688468723973,
+            "high": 0.02623730744394256,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "csi": {
+            "estimate": 0.6057563587684069,
+            "low": 0.39781886790443016,
+            "high": 0.6994984729266627,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          }
+        }
+      },
+      "climatology": {
+        "kind": "baseline",
+        "metrics": {
+          "zone_auprc": {
+            "estimate": 0.15686457971672813,
+            "low": 0.0635349065900565,
+            "high": 0.2559776444935729,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "roc_auc": {
+            "estimate": 0.7002627377096955,
+            "low": 0.6555117283479619,
+            "high": 0.7486880981163873,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "brier": {
+            "estimate": 0.09939549478437383,
+            "low": 0.055632644902014736,
+            "high": 0.14476543721142032,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "bss_vs_climatology": {
+            "estimate": -0.08987881923319985,
+            "low": -0.28290699208904174,
+            "high": -0.0021410030390141875,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "ece": {
+            "estimate": 0.07523168512358054,
+            "low": 0.0603039169098379,
+            "high": 0.10761031551454005,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          },
+          "csi": {
+            "estimate": 0.1782906672041927,
+            "low": 0.06971478252495118,
+            "high": 0.27577708352644653,
+            "n_resamples": 1000,
+            "n_blocks": 121
+          }
+        }
+      }
+    }
+  },
+  "ablations": {}
+}

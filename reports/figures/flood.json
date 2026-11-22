@@ -1,0 +1,134 @@
+{
+ "notes": [
+  "case_holdout: empty set in splits/flood.json (nothing to evaluate).",
+  "Sample set is the FLOOD-13 balanced sample (1/3 positive, 1/3 hard-negative, 1/3 wet patches; seed 0), built exactly as for val from the frozen split ids; pixel prevalence is ~5 % and is NOT the true base rate. AUPRC and Brier are only comparable within this sample; calibrated probabilities are calibrated to the balanced val sample (isotonic, frozen), not to climatology.",
+  "Scored pixels: ring (y == -1) and valid == 0 pixels dropped. Thresholded metrics (pixel CSI/POD/FAR, neighbourhood CSI radius 2, event POD, hard-negative alarm rate) use a fixed p >= 0.5, not tuned; event POD = fraction of positive patches with an alarm pixel in the positive footprint (patch footprints, not individual reports).",
+  "CI = day-block bootstrap over UTC issue days of the patches (per-day sufficient statistics); AUPRC/ROC from 2000 sqrt-spaced score bins (error ~1e-4). Single training seed: CI covers test sampling only, not training variance.",
+  "flood.unet = frozen isotonic-calibrated U-Net (shipped model); flood.unet_raw = same net uncalibrated. Isotonic ties cost about 0.003 AUPRC on val. FLASH ablation (no_flash) was within seed noise on val.",
+  "Logistic regression refit on TRAIN only from a streamed uniform 2 M-pixel subsample (seed 0); its random subset differs from logs/flood_baselines_val.json, so small differences are expected.",
+  "Rule baselines are {0,1} predictors: AUPRC is a single operating point; Brier/ECE are not reported meaningfully for them (ECE omitted).",
+  "No published reference number exists for this patch set; no reference row.",
+  "case_holdout is empty for flood (quarantine touches no flood sample, T14)."
+ ],
+ "figures": {
+  "test": {
+   "info": {
+    "n_patches": 10851,
+    "n_days": 183,
+    "n_pixels": 26280185,
+    "pixel_prevalence": 0.043997064708638844,
+    "kinds": {
+     "positive": 3819,
+     "hard_negative": 3521,
+     "wet": 3511,
+     "dry": 0
+    },
+    "n_positive_patches": 3819
+   },
+   "reliability": {
+    "flood.unet": {
+     "bin_edges": [
+      0.0,
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5,
+      0.6000000000000001,
+      0.7000000000000001,
+      0.8,
+      0.9,
+      1.0
+     ],
+     "count": [
+      23499645,
+      1920125,
+      503788,
+      198336,
+      94109,
+      40325,
+      11322,
+      7588,
+      4742,
+      205
+     ],
+     "mean_pred": [
+      0.026520851564999462,
+      0.13258265848572573,
+      0.23669465590978753,
+      0.34085618546136415,
+      0.4400491374215701,
+      0.5459374889703693,
+      0.6606964839945157,
+      0.7442225838452184,
+      0.8711025867216802,
+      0.9832499666911799
+     ],
+     "obs_freq": [
+      0.026984067206121624,
+      0.13423969793633228,
+      0.22733570470118383,
+      0.33648455146821554,
+      0.43969227172746495,
+      0.5772349659020459,
+      0.7287581699346405,
+      0.7619926199261993,
+      0.8894981020666386,
+      1.0
+     ]
+    },
+    "flood.unet_raw": {
+     "bin_edges": [
+      0.0,
+      0.1,
+      0.2,
+      0.30000000000000004,
+      0.4,
+      0.5,
+      0.6000000000000001,
+      0.7000000000000001,
+      0.8,
+      0.9,
+      1.0
+     ],
+     "count": [
+      7603089,
+      14410006,
+      3480787,
+      595575,
+      154297,
+      31061,
+      5151,
+      219,
+      0,
+      0
+     ],
+     "mean_pred": [
+      0.08000419669989217,
+      0.14191166496115618,
+      0.23442750504896753,
+      0.3391308870069557,
+      0.4380052332307643,
+      0.5365369152410235,
+      0.6325165638528364,
+      0.7212759136609291,
+      NaN,
+      NaN
+     ],
+     "obs_freq": [
+      0.00615644509751234,
+      0.03186626015284102,
+      0.1150346171713466,
+      0.25917138899382947,
+      0.44780520684135144,
+      0.6965970187695181,
+      0.8798291593865268,
+      1.0,
+      NaN,
+      NaN
+     ]
+    }
+   }
+  }
+ }
+}

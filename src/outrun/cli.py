@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import sys
 from collections.abc import Callable
@@ -91,7 +92,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--no-flash", dest="no_flash", action="store_true", help="flood: no-FLASH ablation (8 channels)"
     )
-    p.add_argument("--no-hms", dest="no_hms", action="store_true", help="smoke: no-HMS ablation (10 tabular features)")
+    p.add_argument(
+        "--no-hms", dest="no_hms", action="store_true", help="smoke: no-HMS ablation (10 tabular features)"
+    )
     p.add_argument("--batch-size", dest="batch_size", type=int, default=16)
     p.add_argument("--patience", type=int, default=5, help="early-stopping patience on val loss")
     p.add_argument(
@@ -324,7 +327,11 @@ def _train_flood(args: argparse.Namespace) -> int:
     from outrun.hazards.flood.train import train_flood
 
     no_flash = bool(getattr(args, "no_flash", False))
-    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / ("flood_noflash" if no_flash else "flood")
+    out_dir = (
+        Path(args.out_dir)
+        if args.out_dir
+        else get_paths().models / ("flood_noflash" if no_flash else "flood")
+    )
     device = str(select_device("cpu" if args.device == "cpu" else "mps"))
     _, result = train_flood(
         out_dir,
@@ -376,7 +383,9 @@ def _train_smoke(args: argparse.Namespace) -> int:
     from outrun.hazards.smoke.train import train_smoke
 
     no_hms = bool(getattr(args, "no_hms", False))
-    out_dir = Path(args.out_dir) if args.out_dir else get_paths().models / ("smoke_nohms" if no_hms else "smoke")
+    out_dir = (
+        Path(args.out_dir) if args.out_dir else get_paths().models / ("smoke_nohms" if no_hms else "smoke")
+    )
     device = str(select_device("cpu" if args.device == "cpu" else "mps"))
     _, result = train_smoke(
         out_dir,
@@ -393,8 +402,100 @@ def _train_smoke(args: argparse.Namespace) -> int:
 
 
 def cmd_eval(args: argparse.Namespace) -> int:
-    """Evaluate on val (default) or, with ``--final``, the one-time test run (delegates to ``outrun.eval``)."""
-    raise NotImplementedError("evaluation arrives with the eval tasks")
+    """Evaluate on val (default) or, with ``--final``, the one-time test run (delegates to ``outrun.eval``).
+
+    * ``--split val``: dry run of every hazard evaluator on val, printed only (nothing is written, no ledger entry).
+    * ``--split test --final``: the one-shot held-out run (T24). Verifies ``splits/hashes.json`` first, refuses any
+      model already in ``reports/test_ledger.json``, writes ``reports/metrics/<hazard>.json`` and logs each model
+      with the git sha. Run it once per hazard (``--hazard storm`` ...) or with ``all``.
+    * ``--routing``: routing evaluation of every scenario bundle (the primary case first), the primary group metrics
+      and the latency timings, written to ``reports/metrics``. Needs no held-out hazard data.
+    """
+    import importlib
+
+    from outrun.config import get_paths
+    from outrun.eval import final_run
+    from outrun.eval.report import HAZARDS, RunLedger, write_metrics_md, write_model_metrics
+    from outrun.eval.splits import verify_hashes
+
+    root = Path(__file__).resolve().parents[2]
+    reports = Path(os.environ.get("OUTRUN_REPORTS", root / "reports"))
+    metrics_dir = reports / "metrics"
+
+    if args.routing:
+        scen = Path(os.environ.get("OUTRUN_SCENARIOS", root / "scenarios"))
+        sha = final_run.git_sha(root)
+        primary = "may20-2019"
+        ids = [primary] + [
+            d.name
+            for d in sorted(scen.iterdir())
+            if (d / "risk_observed.zarr").is_dir()
+            and (d / "risk_baseline.zarr").is_dir()
+            and d.name != primary
+            # OKC-graph bundles with a shelter list (the wildfire demo is on the Greenville graph, no shelters)
+            and json.loads((d / "scenario.json").read_text()).get("graph") == "okc"
+            and (d / "results" / "shelters_mcf.json").is_file()
+        ]
+        for sid in ids:
+            n = 500 if sid == primary else 100
+            result, extra = final_run.run_routing(
+                scen, sid, metrics_dir, sha, n_origins=n, primary=sid == primary
+            )
+            c = result.gap_closed
+            print(f"routing {sid}: paired {result.n_paired}/{result.n_origins}, gap closed {c.estimate:.3f} "
+                  f"[{c.low:.3f}, {c.high:.3f}], {extra}", flush=True)  # fmt: skip
+        path, sa = final_run.run_group(scen, primary, metrics_dir, sha, primary=True)
+        print(f"group {primary}: {path.name}, SA median {sa.median_s:.1f}s", flush=True)
+        print(f"A* latency: {final_run.run_latency(scen, metrics_dir, sha, primary)}", flush=True)
+        write_metrics_md(metrics_dir, reports / "metrics.md")
+        return 0
+
+    hazards = list(HAZARDS) if args.hazard == "all" else [args.hazard]
+    if args.split == "val":
+        for hz in hazards:
+            ev = importlib.import_module(f"outrun.hazards.{hz}.final_eval").evaluate("val")
+            for name, models in ev.results.items():
+                for m in models:
+                    print(hz, name, m.name, m.kind, {k: round(v.estimate, 4) for k, v in m.metrics.items()})
+        return 0
+
+    # ---- one-shot held-out run
+    verify_hashes(get_paths().splits, strict=True)  # raises SplitHashMismatch if a frozen split changed
+    ledger = RunLedger(reports / "test_ledger.json")
+    sha = final_run.git_sha(root)
+    for hz in hazards:
+        done = [r for r in ledger.runs(split="test") if r["model"].startswith(f"{hz}.")]
+        if done:
+            raise SystemExit(
+                f"{hz}: the test split was already evaluated ({done[0]['git_sha']}); one run per model"
+            )
+        ev = importlib.import_module(f"outrun.hazards.{hz}.final_eval").evaluate("test")
+        ev.results = {
+            k: v for k, v in ev.results.items() if v
+        }  # a split with no rows (empty case hold-out) is omitted
+        write_model_metrics(
+            metrics_dir, hz, ev.results, ev.primary_metric, ev.higher_is_better, sha, ablations=ev.ablations
+        )
+        for split, models in ev.results.items():
+            for model in sorted({m.name for m in models if m.kind == "dl"} | set(ev.dl_models)):
+                ledger.record(model, sha, split=split)
+        for abl_models in ev.ablations.values():  # ablation checkpoints were evaluated on test too: log them
+            for model in sorted({m.name for m in abl_models if m.kind == "dl"}):
+                if not ledger.runs(model, "test"):
+                    ledger.record(model, sha, split="test")
+        fig = reports / "figures" / f"{hz}.json"
+        fig.parent.mkdir(parents=True, exist_ok=True)
+        fig.write_text(json.dumps({"notes": ev.notes, "figures": ev.figures}, indent=1))
+        prim = ev.primary_metric
+        for split, models in ev.results.items():
+            print(
+                hz,
+                split,
+                {m.name: round(m.metrics[prim].estimate, 4) for m in models if prim in m.metrics},
+                flush=True,
+            )
+    write_metrics_md(metrics_dir, reports / "metrics.md")
+    return 0
 
 
 def cmd_scenario(args: argparse.Namespace) -> int:

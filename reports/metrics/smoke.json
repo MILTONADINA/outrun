@@ -1,0 +1,643 @@
+{
+  "schema": 1,
+  "hazard": "smoke",
+  "git_sha": "72d9715-dirty",
+  "created_utc": "2026-11-21T16:45:12Z",
+  "primary_metric": "rmse_smoke_episodes",
+  "higher_is_better": false,
+  "n_resamples": 1000,
+  "splits": {
+    "test": {
+      "smoke.cnn_mlp": {
+        "kind": "dl",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 10.208922396101912,
+            "low": 8.775092286964988,
+            "high": 11.951192964030483,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 4.00996478408944,
+            "low": 3.788045124945316,
+            "high": 4.274999924298923,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 5.602673060346447,
+            "low": 5.006657890539843,
+            "high": 6.3991816870291895,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 2.574360765869194,
+            "low": 2.5207063941280654,
+            "high": 2.635530646128912,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.1140748413828823,
+            "low": 0.09457251120527328,
+            "high": 0.13218406311424002,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.12202216066481994,
+            "low": 0.1004997422410113,
+            "high": 0.1422136241336874,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.3634393063583815,
+            "low": 0.3220640948865159,
+            "high": 0.4055283767763331,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage": {
+            "estimate": 0.9109465065046382,
+            "low": 0.9090965158860593,
+            "high": 0.9127590967294985,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_episodes": {
+            "estimate": 0.9005119690051197,
+            "low": 0.8929464040587274,
+            "high": 0.9076019930632776,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_shifted": {
+            "estimate": 0.9056154130164804,
+            "low": 0.9037280944517245,
+            "high": 0.9075991878663314,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 12.419776686281114,
+            "low": 10.817893219983713,
+            "high": 14.546728812426828,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 4.821251033518839,
+            "low": 4.540334481588244,
+            "high": 5.150497364785632,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 6.984010024862476,
+            "low": 6.227223724335307,
+            "high": 7.998861038995087,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 3.2294120156335047,
+            "low": 3.1541963207608505,
+            "high": 3.3178314458691998,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.18189253291894986,
+            "low": 0.16336906691537892,
+            "high": 0.20005701367738943,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.3080332409972299,
+            "low": 0.2801527556177064,
+            "high": 0.33414686264684285,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.6924353478080487,
+            "low": 0.6666612504874561,
+            "high": 0.7194348285696512,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "hrrr_calibrated": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 12.198014989224907,
+            "low": 10.67879702395702,
+            "high": 13.912780086502197,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 5.455200959583503,
+            "low": 5.118040604102606,
+            "high": 5.814353222622882,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 6.736818106367792,
+            "low": 6.108686418362183,
+            "high": 7.540438931913861,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 3.6424738765053943,
+            "low": 3.56800221566669,
+            "high": 3.713163288355138,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.05336247910505336,
+            "low": 0.03997960465808826,
+            "high": 0.06920195370726427,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.0574792243767313,
+            "low": 0.042592654716347954,
+            "high": 0.07589062497272774,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.573045267489712,
+            "low": 0.5159743444060766,
+            "high": 0.6302492532273566,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "linear_regression": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 26.275535661583483,
+            "low": 12.541356669713338,
+            "high": 42.89544871736557,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 7.309095453768159,
+            "low": 6.973498034883361,
+            "high": 7.711930627177153,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 9.642323925544753,
+            "low": 7.980630577670361,
+            "high": 12.238957328459932,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 5.540510947161683,
+            "low": 5.448394623728828,
+            "high": 5.638238495313944,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.10125030644765874,
+            "low": 0.07810343664923992,
+            "high": 0.12663087303450551,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.11440443213296399,
+            "low": 0.08678442146463018,
+            "high": 0.1447667728579646,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.5317460317460317,
+            "low": 0.4800117890697841,
+            "high": 0.5832800652003345,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      }
+    },
+    "test_spatial": {
+      "smoke.cnn_mlp": {
+        "kind": "dl",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 12.114022161193747,
+            "low": 9.806888393363346,
+            "high": 14.543923420175418,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 4.54915078391857,
+            "low": 4.177436318218115,
+            "high": 4.942634404205655,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 5.882958363290583,
+            "low": 5.274463187354298,
+            "high": 6.582973616244828,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 2.709946983481071,
+            "low": 2.647973975456956,
+            "high": 2.7773446552655683,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.1126102750389206,
+            "low": 0.08570807753328274,
+            "high": 0.1400306679601615,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.1200885445489762,
+            "low": 0.0912571634305751,
+            "high": 0.15009715735157783,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.3560830860534125,
+            "low": 0.2864397321428571,
+            "high": 0.43643097719721446,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage": {
+            "estimate": 0.904065135439742,
+            "low": 0.9016099825931344,
+            "high": 0.9066566304969537,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_episodes": {
+            "estimate": 0.88952937460518,
+            "low": 0.8790254607137107,
+            "high": 0.8989043914596787,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_shifted": {
+            "estimate": 0.8984532276242665,
+            "low": 0.8959574061300345,
+            "high": 0.9011855031250611,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "persistence": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 14.798519715924929,
+            "low": 12.023802121455923,
+            "high": 17.73728301902155,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 5.53553773514957,
+            "low": 5.065245726805346,
+            "high": 6.055485923690724,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 6.999093649352001,
+            "low": 6.382061841156267,
+            "high": 7.761138885763789,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 3.3317758087391796,
+            "low": 3.2476765805689496,
+            "high": 3.4246518565951014,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.18774574049803408,
+            "low": 0.16413659364546487,
+            "high": 0.21373053391215166,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.3171001660210293,
+            "low": 0.28100798605843347,
+            "high": 0.35407293981430976,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.6848184818481848,
+            "low": 0.6480649540163573,
+            "high": 0.7191320687621617,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "hrrr_calibrated": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 13.670342666071228,
+            "low": 11.535813781410525,
+            "high": 16.009454130842716,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 6.127688735136062,
+            "low": 5.663950857599899,
+            "high": 6.622571028781503,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 6.834714529369804,
+            "low": 6.271641393678022,
+            "high": 7.489111843329888,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 3.8052500394550437,
+            "low": 3.727811199308121,
+            "high": 3.884440818227754,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.03517847904811174,
+            "low": 0.023117582293032818,
+            "high": 0.049322574034763235,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.03763143331488655,
+            "low": 0.024416811258916524,
+            "high": 0.05316134433744994,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.6494845360824743,
+            "low": 0.579227782571182,
+            "high": 0.7214137645107794,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "linear_regression": {
+        "kind": "baseline",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 14.653776561914816,
+            "low": 12.623733242152857,
+            "high": 16.880667614140222,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 7.821556675099069,
+            "low": 7.424090686595495,
+            "high": 8.283850961790098,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 8.583469983821546,
+            "low": 8.160029228862035,
+            "high": 9.115014729947715,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 5.890009580394797,
+            "low": 5.787638114821225,
+            "high": 5.998955014368426,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.1329394387001477,
+            "low": 0.09575710795450314,
+            "high": 0.17095899800598205,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.14941892639734367,
+            "low": 0.10532049089486575,
+            "high": 0.1952796956524921,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.4534412955465587,
+            "low": 0.3932081696088206,
+            "high": 0.5314182194616978,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      }
+    }
+  },
+  "ablations": {
+    "no_hms": {
+      "smoke.cnn_mlp_no_hms": {
+        "kind": "dl",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 10.282624968369294,
+            "low": 8.624288062948345,
+            "high": 12.355829026391214,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 3.9740530320650342,
+            "low": 3.7449894215402435,
+            "high": 4.259500617378627,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 5.578988025448493,
+            "low": 4.980382495921749,
+            "high": 6.38010323298862,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 2.5985325672349004,
+            "low": 2.5462240108656653,
+            "high": 2.657127760113561,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.14895988112927191,
+            "low": 0.12773058647061494,
+            "high": 0.16864558796029297,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.16662049861495845,
+            "low": 0.14158002504030645,
+            "high": 0.18970201295195185,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.4157357940747936,
+            "low": 0.3833463696191607,
+            "high": 0.44981899228118144,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage": {
+            "estimate": 0.9135694830918705,
+            "low": 0.911856166134819,
+            "high": 0.9152619927519223,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_episodes": {
+            "estimate": 0.8994223052442231,
+            "low": 0.8927546881777363,
+            "high": 0.9061961561401134,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_shifted": {
+            "estimate": 0.9085093650251778,
+            "low": 0.9067381242460425,
+            "high": 0.9102939783892182,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      },
+      "smoke.cnn_mlp_no_hms[test_spatial]": {
+        "kind": "dl",
+        "metrics": {
+          "rmse_smoke_episodes": {
+            "estimate": 11.921852868553808,
+            "low": 9.651537358831055,
+            "high": 14.300982245326033,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae_smoke_episodes": {
+            "estimate": 4.451097294957498,
+            "low": 4.093832294008782,
+            "high": 4.854551890455373,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "rmse": {
+            "estimate": 5.780708664581018,
+            "low": 5.202991762944653,
+            "high": 6.478869825883599,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "mae": {
+            "estimate": 2.7161961220543858,
+            "low": 2.6590962771939415,
+            "high": 2.7811021729072958,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "csi_35_4": {
+            "estimate": 0.16732090284592738,
+            "low": 0.13435788376666044,
+            "high": 0.20104834738183214,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "pod_35_4": {
+            "estimate": 0.18871057000553404,
+            "low": 0.15074204565747962,
+            "high": 0.2289744706846103,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "far_35_4": {
+            "estimate": 0.40384615384615385,
+            "low": 0.3550651374680307,
+            "high": 0.4600655541306695,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage": {
+            "estimate": 0.9086782480276709,
+            "low": 0.9062650040509386,
+            "high": 0.910969747158931,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_episodes": {
+            "estimate": 0.8935565382185723,
+            "low": 0.8828259758838825,
+            "high": 0.9029605329159215,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          },
+          "q90_coverage_shifted": {
+            "estimate": 0.9033927946834558,
+            "low": 0.9008869209107677,
+            "high": 0.9057934420041209,
+            "n_resamples": 1000,
+            "n_blocks": 366
+          }
+        }
+      }
+    }
+  }
+}

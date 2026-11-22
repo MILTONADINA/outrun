@@ -1,0 +1,116 @@
+{
+ "notes": [
+  "NDWS has no dates: the bootstrap resamples individual samples (64x64 patches; an unknown number are neighbours from the same fire) with replacement, not day blocks, so the NDWS CIs are probably optimistic. WSTS CIs resample whole fires (a fire's days are strongly dependent).",
+  "PR-AUC and the CIs are computed from per-group score histograms (4096 fixed logit-spaced bins, ties pooled), exact for the {0,1} baselines; differences from sklearn AP are ~1e-4 (see --selfcheck). Labels -1 (uncertain) are ignored everywhere. prauc_new_burn = pixels with PrevFireMask == 0.",
+  "Pixel logistic is refit here on NDWS train only (seed 0, the same 2 M-pixel subsample as val_eval). U-Net, normalisation stats and calibrator (T=2.18, bias=3.07, fitted on val) are frozen from models/wildfire.",
+  "Published NDWS PR-AUC 0.284 (reference row) is not a like-for-like number: different training and evaluation protocol; it is context, never the best baseline.",
+  "No ablation checkpoint exists for wildfire (e.g. no-satellite); the only ablation row is the uncalibrated U-Net (same PR-AUC, worse Brier/ECE).",
+  "WSTS: day-d inputs mapped to the 12 NDWS channels at 1 km with data.wsts.map_to_ndws (population NaN -> NDWS-train mean), label = day d+1 VIIRS any-fire mask (no uncertain class), pairs only for consecutive calendar days; images are zero-padded to a multiple of 8 for the U-Net and cropped back. WSTS fires are western/higher/drier than NDWS (KS shift table, NOTES T13): expect a domain-shift drop.",
+  "WSTS 2021: 156 fires (split.extra['test_wsts2021']).",
+  "case_holdout is empty for wildfire (splits/ndws.json extra['case_holdout'] has 0 items), so results has no 'case_holdout' key."
+ ],
+ "figures": {
+  "reliability_test": {
+   "bin_edges": [
+    0.0,
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4,
+    0.5,
+    0.6000000000000001,
+    0.7000000000000001,
+    0.8,
+    0.9,
+    1.0
+   ],
+   "mean_pred": [
+    0.0066052478692492506,
+    0.14254385295230126,
+    0.24784263937619996,
+    0.35078986620029706,
+    0.4540646804190978,
+    0.5463384486578561,
+    0.6394630620607835,
+    0.7328365538719196,
+    0.8124472269645104,
+    NaN
+   ],
+   "obs_freq": [
+    0.005468689719657744,
+    0.16286197421264004,
+    0.20290175609324546,
+    0.24338041656691406,
+    0.315378362139045,
+    0.4529137529137529,
+    0.5952979876160991,
+    0.7612721417069244,
+    0.8,
+    NaN
+   ],
+   "counts": [
+    6570861,
+    37848,
+    22607,
+    20885,
+    28293,
+    34320,
+    10336,
+    2484,
+    65,
+    0
+   ]
+  },
+  "reliability_test_wsts2021": {
+   "bin_edges": [
+    0.0,
+    0.1,
+    0.2,
+    0.30000000000000004,
+    0.4,
+    0.5,
+    0.6000000000000001,
+    0.7000000000000001,
+    0.8,
+    0.9,
+    1.0
+   ],
+   "mean_pred": [
+    0.007681776197995602,
+    0.14194039767480393,
+    0.24653475314570358,
+    0.3501184951772844,
+    0.45261118486413154,
+    0.54132652912804,
+    0.6250922549386408,
+    0.7205560600666134,
+    NaN,
+    NaN
+   ],
+   "obs_freq": [
+    0.0008155113312220753,
+    0.030725185483191902,
+    0.06027048261946936,
+    0.1118003411979064,
+    0.24221092064723843,
+    0.4761159329541567,
+    0.507894603239072,
+    0.20971867007672634,
+    NaN,
+    NaN
+   ],
+   "counts": [
+    41478271,
+    427532,
+    215097,
+    172334,
+    216489,
+    172479,
+    19697,
+    391,
+    0,
+    0
+   ]
+  }
+ }
+}
