@@ -29,7 +29,9 @@ make e2e            # Playwright offline-demo test (python -m playwright install
 `scenarios/` is committed, so a clean clone runs the demo with no data, models or network. Live recomputation
 (`make serve`) needs the data and trained models, which are not committed (see "Data location").
 
-**Demo GIF and narrated video:** recorded in T28; link added here when the release exists.
+![Outrun demo: forecast, safe route, shelters, evacuation, metrics](docs/demo.gif)
+
+The GIF is captured from `outrun serve --demo` (`scripts/make_demo_gif.py`). The narrated video script is `DEMO.md`; the MP4 link is added here when the `v1.0-rc` release exists.
 
 ### Static demo (GitHub Pages)
 
